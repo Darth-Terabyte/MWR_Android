@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BYOD Asset Tracker</string>
+    <string name="action_settings">Settings</string>
+    <string name="registration">Device Registration</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="email">Email</string>
+    <string name="id">ID number</string>
+    <string name="password">Password</string>
+    <string name="confirmpass">Confirm password</string>
+    <string name="register">Register</string>
+    <string name="title_activity_password_dialog">Password mismatch</string>
+    <string name="password_mismatch">The passwords you have entered do not match. Please re-enter your password</string>
+    <string name="title_activity_scan">Anti-virus Scan</string>
+    <string name="download">AVG Anti-virus is required to continue</string>
+    <string name="title_activity_sampling">Device Sampling</string>
+    <string name="sampling_progress">Checking device</string>
+    <string name="title_activity_registration">Device Registration</string>
+    <string name="hello_world">Hello world!</string>
+
+</resources>
