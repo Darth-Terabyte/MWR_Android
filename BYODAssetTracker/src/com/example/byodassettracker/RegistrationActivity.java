@@ -8,9 +8,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.lang.System;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -20,7 +21,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
-import android.os.*;
 
 public class RegistrationActivity extends FragmentActivity {
 	
@@ -51,29 +51,28 @@ public class RegistrationActivity extends FragmentActivity {
 		return macAddr;
 	}
 	
+	public String getHwId()
+	{
+		String hwID = java.lang.System.getProperty("ro.serialno", "unknown");
+		return hwID;
+	}
+	
 	public String getSerial()
 	{
-		String hwID = getProperty("ro.serialno", "unknown");
-		 idView.append( "hwID : " + hwID + "\n" ); 
-		     String serialnum = null;      
+		
+		 String serialnum = null;      
 		 try {         
 		   Class<?> c = Class.forName("android.os.SystemProperties");        	           	      
 		   Method get = c.getMethod("get", String.class, String.class );                 
 	               serialnum = (String)(   get.invoke(c, "ro.serialno", "unknown" )  );
-		    idView.append( "serial : " + serialnum + "\n" );
+	              
 	        	} catch (Exception ignored) {       
 	           }
-		String serialnum2 = null;
-	           try {
-		Class myclass = Class.forName( "android.os.SystemProperties" );
-	       	Method[] methods = myclass.getMethods();
-	       	Object[] params = new Object[] { new String( "ro.serialno" ) , new String(  
-	              "Unknown" ) };        	
-	        	serialnum2 = (String)(methods[2].invoke( myclass, params ));        	
-	            idView.append( "serial2 : " + serialnum2 + "\n" ); 
-	           }catch (Exception ignored) 
-		{     	
+		 
+		 return serialnum;
 	}
+	
+
 	
 	
 	public String getAndroidID()
@@ -93,18 +92,27 @@ public class RegistrationActivity extends FragmentActivity {
 		
 		//Get device's MAC address
 		String mac = getMAC();
-		//String uid = getSerial();
 		String androidID = getAndroidID();
-		EditText editText = (EditText) findViewById(R.id.name);
-		editText.setHint(mac);
-		editText = (EditText) findViewById(R.id.surname);
-		editText.setHint(androidID);
+		String serial = android.os.Build.SERIAL;
+		String man = android.os.Build.MANUFACTURER;
+		String model = android.os.Build.MODEL;
+//		EditText editText = (EditText) findViewById(R.id.name);
+//		editText.setHint(mac);
+//		editText = (EditText) findViewById(R.id.surname);
+//		editText.setHint(androidID);
+//		editText = (EditText) findViewById(R.id.email);
+//		editText.setHint(serial);
+//		editText = (EditText) findViewById(R.id.idnumber);
+//		editText.setHint(man);
+//		editText = (EditText) findViewById(R.id.password1);
+//		editText.setHint(model);
 		//System.out.println("MAC" + mac +  " Serial " + uid);
 		
 		
-		/*String host = "192.168.1.103";
-        String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make=Samsung&model=Galaxy+S4&mac="+mac+"&serial=world&uid=123&submit=Register";
-        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		String host = "192.168.0.4";
+        String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
+		//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make=man&model=model&mac=mac&serial=serial&uid=androidID&submit=Register";
+		ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadWebpageTask().execute(stringUrl);

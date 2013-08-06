@@ -10,8 +10,10 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 	
 	
 	 
@@ -51,6 +53,40 @@ public class MainActivity extends Activity {
 	{
 		Intent intent = new Intent(this, ScanActivity.class);
 		startActivity(intent);
+	}
+	
+	public void sources(View view)
+	{
+		int allowed = 0;
+		try {
+			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS);
+		} catch (SettingNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (allowed == 1)
+		{
+			SourcesDialog df = new SourcesDialog();
+			df.show(getSupportFragmentManager(), "MyDF2");
+		}
+    	
+	}
+	
+	public void debug(View view)
+	{
+		int allowed = 0;
+		try {
+			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.ADB_ENABLED);
+		} catch (SettingNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (allowed == 1)
+		{
+	    	DebugDialog df = new DebugDialog();
+			df.show(getSupportFragmentManager(), "MyDF2");
+		}
+
 	}
 
 }

@@ -38,7 +38,24 @@
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sample"
-        android:onClick="sample" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="sample"
+        android:text="Sample" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="debug"
+        android:text="USB Debugging" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="sources"
+        android:text="Unknown sources" />
 
 </LinearLayout>
