@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -17,6 +19,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
@@ -85,7 +88,7 @@ public class RegistrationActivity extends FragmentActivity {
 	
 
 	
-	public void register(View view)  throws IOException 
+	public void register(View view)  throws IOException, NoSuchAlgorithmException 
 	{		
 		// Gets the URL from the UI's text field.
 		
@@ -108,17 +111,80 @@ public class RegistrationActivity extends FragmentActivity {
 //		editText.setHint(model);
 		//System.out.println("MAC" + mac +  " Serial " + uid);
 		
+		EditText editText = (EditText) findViewById(R.id.name);
+		String name =  editText.getText().toString();
+		editText = (EditText) findViewById(R.id.surname);		
+		String surname =  editText.getText().toString();
+		editText = (EditText) findViewById(R.id.id);
+		String id =  editText.getText().toString();
 		
-		String host = "192.168.0.4";
-        String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
-		//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make=man&model=model&mac=mac&serial=serial&uid=androidID&submit=Register";
-		ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(stringUrl);
-        } else {
-           System.out.println("No network connection available.");
-        }
+		editText = (EditText) findViewById(R.id.username);
+		String username = editText.getText().toString();		
+		editText = (EditText) findViewById(R.id.password1);
+		String password = editText.getText().toString();
+		editText = (EditText) findViewById(R.id.password2);		
+		String password2 = editText.getText().toString();
+		if (!password.equals(password2))
+		{
+			DialogFragment df = new PasswordDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+		}
+		else
+		{
+			//md5 hash password
+			MessageDigest digester = MessageDigest.getInstance("MD5");
+	        byte[] hash = digester.digest(password.getBytes());
+	        StringBuilder builder = new StringBuilder(2*hash.length);
+	        for (byte b : hash)
+	        {
+	            builder.append(String.format("%02x",b&0xff));
+	        }	
+	        
+	        password = builder.toString();
+
+			//send details to server
+			String host = "192.168.0.4";
+			//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
+	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";
+			ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+	        if (networkInfo != null && networkInfo.isConnected()) {
+	            new DownloadWebpageTask().execute(stringUrl);
+	        } else {
+	           System.out.println("No network connection available.");
+	        }
+	        
+	        //generate token
+	        String composite =mac+androidID+serial;
+	        hash = digester.digest(composite.getBytes());
+	        builder = new StringBuilder(2*hash.length);
+	        for (byte b : hash)
+	        {
+	            builder.append(String.format("%02x",b&0xff));
+	        }
+	        String hashkey = builder.toString();
+	        int skip = Math.round((float)hashkey.length()/5);
+	        int index = 0;
+	        String token = "";
+	        for (int i=0;i<5;i++)
+	        {
+	        	token += hashkey.charAt(index);
+	        	index += skip;
+	        }
+	        
+	        
+	        DialogFragment df = new TokenDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("token", token);
+			df.setArguments(args);
+	        
+	        
+	        
+	        
+		}
+		
+
 		
 		
 		//InputStream is = null;

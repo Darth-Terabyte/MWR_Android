@@ -55,38 +55,6 @@ public class MainActivity extends FragmentActivity {
 		startActivity(intent);
 	}
 	
-	public void sources(View view)
-	{
-		int allowed = 0;
-		try {
-			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS);
-		} catch (SettingNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (allowed == 1)
-		{
-			SourcesDialog df = new SourcesDialog();
-			df.show(getSupportFragmentManager(), "MyDF2");
-		}
-    	
-	}
-	
-	public void debug(View view)
-	{
-		int allowed = 0;
-		try {
-			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.ADB_ENABLED);
-		} catch (SettingNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (allowed == 1)
-		{
-	    	DebugDialog df = new DebugDialog();
-			df.show(getSupportFragmentManager(), "MyDF2");
-		}
 
-	}
 
 }

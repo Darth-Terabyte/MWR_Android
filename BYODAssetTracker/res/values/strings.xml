@@ -14,7 +14,7 @@
     <string name="title_activity_password_dialog">Password mismatch</string>
     <string name="password_mismatch">The passwords you have entered do not match. Please re-enter your password</string>
     <string name="title_activity_scan">Anti-virus Scan</string>
-    <string name="download">AVG Anti-virus is required to continue</string>
+    <string name="download">This device does not have AVG Anti-virus installed</string>
     <string name="title_activity_sampling">Device Sampling</string>
     <string name="sampling_progress">Checking device</string>
     <string name="title_activity_registration">Device Registration</string>

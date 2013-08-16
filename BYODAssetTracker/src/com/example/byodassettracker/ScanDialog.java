@@ -21,7 +21,11 @@ public class ScanDialog extends DialogFragment {
                 	   i.setData(Uri.parse(url));
                 	   startActivity(i);
                    }
-               });
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            	   public void onClick(DialogInterface dialog, int id) {}
+               })
+               ;
         // Create the AlertDialog object and return it
         return builder.create();
     }
