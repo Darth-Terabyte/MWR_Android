@@ -3,6 +3,7 @@ package com.example.byodassettracker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -10,6 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -32,6 +36,16 @@ public class RegistrationActivity extends FragmentActivity {
 	 public final static String EMAIL = "com.example.myfirstapp.EMAIL";
 	 public final static String ID = "com.example.myfirstapp.ID";
 	 public final static String PASSWORD = "com.example.myfirstapp.PASSWORD";
+	 private String model;
+	 private String man;
+	 private String androidID;
+	 private String serial;
+	 private String mac;
+	 private String username;
+	 private String password;
+	 private String name;
+	 private String surname;
+	 private String id;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,40 +102,25 @@ public class RegistrationActivity extends FragmentActivity {
 	
 
 	
-	public void register(View view)  throws IOException, NoSuchAlgorithmException 
-	{		
-		// Gets the URL from the UI's text field.
-		
+	public void register(View view)  throws IOException, NoSuchAlgorithmException, JSONException 
+	{	
 		
 		//Get device's MAC address
-		String mac = getMAC();
-		String androidID = getAndroidID();
-		String serial = android.os.Build.SERIAL;
-		String man = android.os.Build.MANUFACTURER;
-		String model = android.os.Build.MODEL;
-//		EditText editText = (EditText) findViewById(R.id.name);
-//		editText.setHint(mac);
-//		editText = (EditText) findViewById(R.id.surname);
-//		editText.setHint(androidID);
-//		editText = (EditText) findViewById(R.id.email);
-//		editText.setHint(serial);
-//		editText = (EditText) findViewById(R.id.idnumber);
-//		editText.setHint(man);
-//		editText = (EditText) findViewById(R.id.password1);
-//		editText.setHint(model);
-		//System.out.println("MAC" + mac +  " Serial " + uid);
-		
+		mac = getMAC();
+		androidID = getAndroidID();
+		serial = android.os.Build.SERIAL;
+		man = android.os.Build.MANUFACTURER;
+		model = android.os.Build.MODEL;		
 		EditText editText = (EditText) findViewById(R.id.name);
-		String name =  editText.getText().toString();
+		name =  editText.getText().toString();
 		editText = (EditText) findViewById(R.id.surname);		
-		String surname =  editText.getText().toString();
+		surname =  editText.getText().toString();
 		editText = (EditText) findViewById(R.id.id);
-		String id =  editText.getText().toString();
-		
+		id =  editText.getText().toString();		
 		editText = (EditText) findViewById(R.id.username);
-		String username = editText.getText().toString();		
+		username = editText.getText().toString();		
 		editText = (EditText) findViewById(R.id.password1);
-		String password = editText.getText().toString();
+		password = editText.getText().toString();
 		editText = (EditText) findViewById(R.id.password2);		
 		String password2 = editText.getText().toString();
 		if (!password.equals(password2))
@@ -141,12 +140,80 @@ public class RegistrationActivity extends FragmentActivity {
 	        }	
 	        
 	        password = builder.toString();
-
+	        System.out.println(password);
+	        String host = "10.150.246.222";	     
+	        
+//	        URL url;
+//	        HttpURLConnection connection = null;  
+//	        String targetURL =  "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";			
+//	        try {
+//	          //Create connection
+//	          url = new URL(targetURL);
+//	          connection = (HttpURLConnection)url.openConnection();
+//	          connection.setRequestMethod("POST");
+////	          connection.setRequestProperty("Content-Type", 
+////	               "application/x-www-form-urlencoded");
+//	    			
+//	          connection.setRequestProperty("Content-Length", "" + 
+//	                   Integer.toString(urlParameters.getBytes().length));
+//	          connection.setRequestProperty("Content-Language", "en-US");  
+//	    			
+//	          connection.setUseCaches (false);
+//	          connection.setDoInput(true);
+//	          connection.setDoOutput(true);
+//
+//	          //Send request
+//	          DataOutputStream wr = new DataOutputStream (
+//	                      connection.getOutputStream ());
+//	          wr.writeBytes (urlParameters);
+//	          wr.flush ();
+//	          wr.close ();
+//	        
+//	        
+//	        
+//	        URL url = new URL("http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register");
+////			
+//	        URL url = new URL("http://" + host + ":8080/BYOD/");	   
+//	        URL url = new URL("http://www.google.com");
+//	        HttpURLConnection con =(HttpURLConnection)url.openConnection();      
+//            con.setRequestMethod("GET");
+//            //con.setDoInput(true);
+//            //con.setDoOutput(true);
+//            //con.setUseCaches(false);            
+//            //con.setRequestProperty("content-type","application/json; charset=utf-8"); 
+//            con.connect();
+//            try {
+//            	
+//            	 OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+//
+//            	JSONObject data = new JSONObject();
+//     	        data.put("make", man);
+//     	        data.put("model", model);
+//     	        data.put("mac", mac);
+//     	        data.put("serial", serial);
+//     	        data.put("android", androidID);
+//     	        data.put("username", username);
+//     	        data.put("password", password);
+//     	        data.put("name", name);
+//     	        data.put("surname", surname);
+//     	        data.put("id", id);
+//     	        wr.write(data.toString());
+//                wr.flush();
+//
+//        } catch (Exception e) {
+//        	e.printStackTrace();
+//            System.out.println("Unable to retrieve web page. URL may be invalid.");
+//            return;
+//        }
+	       
+	        
 			//send details to server
-			String host = "192.168.0.4";
-			//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
-	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";
-			ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+//			
+//			//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
+//	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";
+	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration";
+			
+	        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 	        if (networkInfo != null && networkInfo.isConnected()) {
 	            new DownloadWebpageTask().execute(stringUrl);
@@ -183,73 +250,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        
 	        
 		}
-		
 
-		
-		
-		//InputStream is = null;
-	    // Only display the first 500 characters of the retrieved
-	    // web page content.
-	    //int len = 500;
-	    //String server = "http://10.203.19.50:8080/AffableBean/";
-	    //String server = "http://www.google.com";
-	    /*try {
-	        URL url = new URL(server);
-	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-	        //conn.setReadTimeout(10000);
-	        //conn.setConnectTimeout(15000);
-	        conn.setRequestMethod("GET");
-	        conn.setDoInput(true);
-	        // Starts the query
-	        
-	        	conn.connect();*/
-	        
-
-	        //int response = conn.getResponseCode();
-	        //Log.d(DEBUG_TAG, "The response is: " + response);
-	        //is = conn.getInputStream();
-	        	        // Convert the InputStream into a string
-	        //String contentAsString = readIt(is, len);
-	        //System.out.println("response " + contentAsString);
-	        
-	        
-	        
-	    // Makes sure that the InputStream is closed after the app is
-	    // finished using it.
-
-			
-		/*EditText editText = (EditText) findViewById(R.id.password1);
-		String password = editText.getText().toString();
-		editText = (EditText) findViewById(R.id.password2);		
-		String password2 = editText.getText().toString();
-		if (!password.equals(password2))
-		{
-			DialogFragment df = new PasswordDialog();
-			df.show(getSupportFragmentManager(), "MyDF");
-		}
-		else
-		{
-		
-		
-		
-			Intent intent = new Intent(this, ScanActivity.class);
-			
-			editText = (EditText) findViewById(R.id.name);
-			String name = editText.getText().toString();
-			editText = (EditText) findViewById(R.id.surname);
-			String surname = editText.getText().toString();
-			editText = (EditText) findViewById(R.id.email);
-			String email = editText.getText().toString();
-			editText = (EditText) findViewById(R.id.idnumber);
-			String id = editText.getText().toString();
-			editText = (EditText) findViewById(R.id.password1);	
-			intent.putExtra(NAME, name);
-			intent.putExtra(SURNAME, surname);
-			intent.putExtra(EMAIL, email);
-			intent.putExtra(ID, id);
-			intent.putExtra(PASSWORD, password);
-			startActivity(intent);
-		}*/
 		
 	}
 	
@@ -289,14 +290,36 @@ public class RegistrationActivity extends FragmentActivity {
 	    int len = 500;
 	        
 	    try {
-	        URL url = new URL(myurl);
+	        URL url = new URL(myurl);	        
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("POST");
 	        conn.setDoInput(true);
+	        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
 	        // Starts the query
 	        conn.connect();
+	        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+	        
+        	JSONObject data = new JSONObject();
+ 	        try {
+				data.put("make", man);
+     	        data.put("model", "model");
+     	        data.put("mac", "mac");
+     	        data.put("serial", serial);
+     	        data.put("android", androidID);
+     	        data.put("username", username);
+     	        data.put("password",password);
+     	        data.put("name", name);
+     	        data.put("surname", surname);
+     	        data.put("id", id);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+ 	        wr.write(data.toString());
+            wr.flush();
 	        int response = conn.getResponseCode();
 	        //Log.d(DEBUG_TAG, "The response is: " + response);
 	        is = conn.getInputStream();
