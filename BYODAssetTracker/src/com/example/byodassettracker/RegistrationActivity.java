@@ -141,7 +141,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        
 	        password = builder.toString();
 	        System.out.println(password);
-	        String host = "10.150.246.222";	     
+	        String host = "192.168.0.4";	     
 	        
 //	        URL url;
 //	        HttpURLConnection connection = null;  
@@ -304,8 +304,8 @@ public class RegistrationActivity extends FragmentActivity {
         	JSONObject data = new JSONObject();
  	        try {
 				data.put("make", man);
-     	        data.put("model", "model");
-     	        data.put("mac", "mac");
+     	        data.put("model", model);
+     	        data.put("mac", mac);
      	        data.put("serial", serial);
      	        data.put("android", androidID);
      	        data.put("username", username);

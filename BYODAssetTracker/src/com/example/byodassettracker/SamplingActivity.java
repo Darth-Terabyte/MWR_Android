@@ -108,7 +108,7 @@ public class SamplingActivity extends FragmentActivity {
 	    checkUnknown();
 	    //System.out.println(debug + " " + rooted + " " + apps + " " + unknown);
 	    //showProgress(false);
-	    String host = "10.150.246.222";
+	    String host = "192.168.0.4";
 	    
 //	    if (debug)
 //	    {
@@ -253,6 +253,18 @@ public class SamplingActivity extends FragmentActivity {
         @Override
         protected void onPostExecute(String result) {
             System.out.println("result: " + result);
+            if (result.startsWith("allowed"))
+            {
+            	DialogFragment df = new AccessAllowedDialog();
+    			df.show(getSupportFragmentManager(), "MyDF");
+            }
+            else if (result.startsWith("denied"))
+            {
+            	DialogFragment df = new AccessDeniedDialog();
+    			df.show(getSupportFragmentManager(), "MyDF");
+
+            }
+            	
        }
     }
 	
@@ -293,7 +305,7 @@ public class SamplingActivity extends FragmentActivity {
      	        data.put("unknown", unknown);
      	        data.put("os", os);
      	        data.put("apps", apps.toString());
-     	        data.put("mac","mac");
+     	        data.put("mac",getMAC());
      	        data.put("serial", getSerial());
      	        data.put("android",getAndroidID());
      	        
@@ -305,6 +317,7 @@ public class SamplingActivity extends FragmentActivity {
  	        wr.write(data.toString());
  	        wr.flush();
 	        int response = conn.getResponseCode();
+	        System.out.println(response);
 	        //Log.d(DEBUG_TAG, "The response is: " + response);
 	        is = conn.getInputStream();
 
