@@ -46,11 +46,13 @@ public class RegistrationActivity extends FragmentActivity {
 	 private String name;
 	 private String surname;
 	 private String id;
+	 DeviceInfo device;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_registration);
+		
 	}
 
 	@Override
@@ -59,56 +61,10 @@ public class RegistrationActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.registration, menu);
 		return true;
 	}
-	
-	public String getMAC()
-	{
-		WifiManager wifiMan = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-		WifiInfo wifiInf = wifiMan.getConnectionInfo();
-		String macAddr = wifiInf.getMacAddress();
-		return macAddr;
-	}
-	
-	public String getHwId()
-	{
-		String hwID = java.lang.System.getProperty("ro.serialno", "unknown");
-		return hwID;
-	}
-	
-	public String getSerial()
-	{
-		
-		 String serialnum = null;      
-		 try {         
-		   Class<?> c = Class.forName("android.os.SystemProperties");        	           	      
-		   Method get = c.getMethod("get", String.class, String.class );                 
-	               serialnum = (String)(   get.invoke(c, "ro.serialno", "unknown" )  );
-	              
-	        	} catch (Exception ignored) {       
-	           }
-		 
-		 return serialnum;
-	}
-	
 
-	
-	
-	public String getAndroidID()
-	{
-		String androidId = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);			       
-		return androidId;
-	}
-	
-	
-	
-
-	
 	public void register(View view)  throws IOException, NoSuchAlgorithmException, JSONException 
 	{	
-		
-		//Get device's MAC address
-		mac = getMAC();
-		androidID = getAndroidID();
-		serial = android.os.Build.SERIAL;
+		device = new DeviceInfo(this);
 		man = android.os.Build.MANUFACTURER;
 		model = android.os.Build.MODEL;		
 		EditText editText = (EditText) findViewById(R.id.name);
@@ -141,76 +97,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        
 	        password = builder.toString();
 	        System.out.println(password);
-	        String host = "192.168.0.4";	     
-	        
-//	        URL url;
-//	        HttpURLConnection connection = null;  
-//	        String targetURL =  "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";			
-//	        try {
-//	          //Create connection
-//	          url = new URL(targetURL);
-//	          connection = (HttpURLConnection)url.openConnection();
-//	          connection.setRequestMethod("POST");
-////	          connection.setRequestProperty("Content-Type", 
-////	               "application/x-www-form-urlencoded");
-//	    			
-//	          connection.setRequestProperty("Content-Length", "" + 
-//	                   Integer.toString(urlParameters.getBytes().length));
-//	          connection.setRequestProperty("Content-Language", "en-US");  
-//	    			
-//	          connection.setUseCaches (false);
-//	          connection.setDoInput(true);
-//	          connection.setDoOutput(true);
-//
-//	          //Send request
-//	          DataOutputStream wr = new DataOutputStream (
-//	                      connection.getOutputStream ());
-//	          wr.writeBytes (urlParameters);
-//	          wr.flush ();
-//	          wr.close ();
-//	        
-//	        
-//	        
-//	        URL url = new URL("http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register");
-////			
-//	        URL url = new URL("http://" + host + ":8080/BYOD/");	   
-//	        URL url = new URL("http://www.google.com");
-//	        HttpURLConnection con =(HttpURLConnection)url.openConnection();      
-//            con.setRequestMethod("GET");
-//            //con.setDoInput(true);
-//            //con.setDoOutput(true);
-//            //con.setUseCaches(false);            
-//            //con.setRequestProperty("content-type","application/json; charset=utf-8"); 
-//            con.connect();
-//            try {
-//            	
-//            	 OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-//
-//            	JSONObject data = new JSONObject();
-//     	        data.put("make", man);
-//     	        data.put("model", model);
-//     	        data.put("mac", mac);
-//     	        data.put("serial", serial);
-//     	        data.put("android", androidID);
-//     	        data.put("username", username);
-//     	        data.put("password", password);
-//     	        data.put("name", name);
-//     	        data.put("surname", surname);
-//     	        data.put("id", id);
-//     	        wr.write(data.toString());
-//                wr.flush();
-//
-//        } catch (Exception e) {
-//        	e.printStackTrace();
-//            System.out.println("Unable to retrieve web page. URL may be invalid.");
-//            return;
-//        }
-	       
-	        
-			//send details to server
-//			
-//			//String stringUrl = "http://"+ host + ":8080/BYOD/registerDevice?emp=2&make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&uid="+androidID+"&submit=Register";
-//	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration?make="+ man + "&model="+model+"&mac="+mac+"&serial="+serial+"&android="+androidID+"&username="+username+"&password="+password+"&name="+name+"&surname="+surname+"&id="+id+"&submit=Register";
+	        String host = "197.175.59.185";	     
 	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration";
 			
 	        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -277,6 +164,7 @@ public class RegistrationActivity extends FragmentActivity {
 	    reader = new InputStreamReader(stream, "UTF-8");        
 	    char[] buffer = new char[len];
 	    reader.read(buffer);
+	    int i =0;
 	    return new String(buffer);
     }
 	
@@ -300,19 +188,22 @@ public class RegistrationActivity extends FragmentActivity {
 	        // Starts the query
 	        conn.connect();
 	        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-	        
+	      
         	JSONObject data = new JSONObject();
  	        try {
-				data.put("make", man);
+				//data.put("make", man);
+ 	        	data.put("make", "man");
      	        data.put("model", model);
-     	        data.put("mac", mac);
-     	        data.put("serial", serial);
-     	        data.put("android", androidID);
+     	        //data.put("mac", device.getMACAddress());
+     	       data.put("mac", "mac");
+     	        data.put("serial", device.getSerialNumber());
+     	        data.put("android", device.getAndroidID());
      	        data.put("username", username);
      	        data.put("password",password);
      	        data.put("name", name);
      	        data.put("surname", surname);
      	        data.put("id", id);
+     	
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -41,23 +41,13 @@ import android.view.View;
 public class SamplingActivity extends FragmentActivity {
 	
 	private View SamplingStatusView;
-	private boolean rooted;
-	private ArrayList<String> apps;
-	private boolean debug;
-	private boolean unknown;
-	private boolean avg;
-	private int os;
+	private DeviceInfo device;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sampling);
 		SamplingStatusView = findViewById(R.id.sampling_status);
-		//showProgress(true);
-		rooted = false;
-		debug = false;
-		unknown = false;
-		avg = false;
 		sample();
 		
 	}
@@ -68,11 +58,6 @@ public class SamplingActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.sampling, menu);
 		return true;
 	}
-	
-	
-	
-	
-	
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	private void showProgress(final boolean show) {
@@ -100,25 +85,10 @@ public class SamplingActivity extends FragmentActivity {
 	
 	public void sample()
 	{		
-	    checkDebug();
-	    getApps();   	    
-	    getOS();
-	    if (!rooted)
-	    	checkRooted();
-	    checkUnknown();
-	    //System.out.println(debug + " " + rooted + " " + apps + " " + unknown);
-	    //showProgress(false);
-	    String host = "192.168.0.4";
-	    
-//	    if (debug)
-//	    {
-//	    	DialogFragment df = new DebugDialog();
-//			df.show(getSupportFragmentManager(), "MyDF");
-//	    }
-	    
-	    
-	    //System.out.println("http://"+ host + ":8080/BYOD/scanResults?rooted="+ Boolean.toString(rooted) + "&debug="+Boolean.toString(debug)+"&unknown="+Boolean.toString(unknown)+"&apps="+apps + "&submit=Register");
-	    //String stringUrl = "http://"+ host + ":8080/BYOD/scanResults?rooted="+ rooted+ "&debug="+debug+"&unknown="+unknown+"&apps="+apps+"&submit=Register";
+		device = new DeviceInfo(this);
+		System.out.println(device.getRooted() + " " + device.getDebug() + " " + device.getUnknownSourcesAllowed() + " " + device.getAPILevel() + " " +  device.getApps().toString() + " " + device.getMACAddress() + " " +  device.getSerialNumber() + " " + device.getAndroidID());
+		
+	    String host = "197.175.59.185";
 	    String stringUrl = "http://"+ host + ":8080/BYOD/scanResults";
 	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -129,113 +99,6 @@ public class SamplingActivity extends FragmentActivity {
            System.out.println("No network connection available.");
         }
 
-	}
-	
-	public void getOS()
-	{
-		os = Build.VERSION.SDK_INT;
-	}
-	
-	
-	public void checkRooted()
-	{
-	    
-			File file = new File("/system/xbin/su");  
-	        rooted = file.exists();  	                                  
-	     
-	}
-	
-	public void getApps()
-	{
-		PackageManager pm = this.getPackageManager();
-	    Intent intent = new Intent(Intent.ACTION_MAIN, null);
-	    intent.addCategory(Intent.CATEGORY_LAUNCHER);
-	    List<ResolveInfo> list = pm.queryIntentActivities(intent,PackageManager.PERMISSION_GRANTED);
-	    String str;
-	    apps = new ArrayList<String>();
-	    for (ResolveInfo rInfo : list) {
-	        str = rInfo.activityInfo.applicationInfo.loadLabel(pm).toString();
-	        apps.add(str);
-	    //results.add(rInfo.activityInfo.applicationInfo.loadLabel(pm).toString());
-	        if (str.toLowerCase().equals("superuser"))
-	        {
-	        	rooted = true;
-	        }      
-	        else if (str.contains("AVG"))
-	        	avg = true;
-	        		
-	        //System.out.println(str + " in package " + rInfo.activityInfo.applicationInfo.packageName);
-	    }
-
-	    
-//        if (!avg)
-//        {
-//        	ScanDialog df = new ScanDialog();
-//    		df.show(getSupportFragmentManager(), "MyDF2");
-//        }
-	    
-
-	}
-	
-	
-	public void checkDebug()
-	{
-		int allowed = 0;
-		try {
-			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.ADB_ENABLED);
-		} catch (SettingNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (allowed == 1)
-			debug = true;
-	}
-	
-	public void checkUnknown()
-	{
-		int allowed = 0;
-		try {
-			allowed = Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS);
-		} catch (SettingNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (allowed == 1)
-			unknown = true;
-    	
-	}
-	
-	public String getMAC()
-	{
-		WifiManager wifiMan = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-		WifiInfo wifiInf = wifiMan.getConnectionInfo();
-		String macAddr = wifiInf.getMacAddress();
-		return macAddr;
-	}
-	
-	
-	public String getSerial()
-	{
-		
-		 String serialnum = null;      
-		 try {         
-		   Class<?> c = Class.forName("android.os.SystemProperties");        	           	      
-		   Method get = c.getMethod("get", String.class, String.class );                 
-	               serialnum = (String)(   get.invoke(c, "ro.serialno", "unknown" )  );
-	              
-	        	} catch (Exception ignored) {       
-	           }
-		 
-		 return serialnum;
-	}
-	
-
-	
-	
-	public String getAndroidID()
-	{
-		String androidId = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);			       
-		return androidId;
 	}
 	
 	private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
@@ -281,8 +144,6 @@ public class SamplingActivity extends FragmentActivity {
 	// a string.
 	private String downloadUrl(String myurl) throws IOException {
 	    InputStream is = null;
-	    // Only display the first 500 characters of the retrieved
-	    // web page content.
 	    int len = 500;
 	        
 	    try {
@@ -293,24 +154,22 @@ public class SamplingActivity extends FragmentActivity {
 	        conn.setRequestMethod("POST");
 	        conn.setDoInput(true);
 	        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
-	        // Starts the query
 	        conn.connect();
 	        
 	        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 	        
         	JSONObject data = new JSONObject();
  	        try {
-				data.put("rooted", rooted);
-     	        data.put("debug", debug);
-     	        data.put("unknown", unknown);
-     	        data.put("os", os);
-     	        data.put("apps", apps.toString());
-     	        data.put("mac",getMAC());
-     	        data.put("serial", getSerial());
-     	        data.put("android",getAndroidID());
+ 	        	data.put("rooted", device.getRooted());
+     	        data.put("debug", device.getDebug());
+     	        data.put("unknown", device.getUnknownSourcesAllowed());
+     	        data.put("os", device.getAPILevel());
+     	        data.put("apps", device.getApps().toString());
+     	        data.put("mac",device.getMACAddress());
+     	        data.put("serial", device.getSerialNumber());
+     	        data.put("android",device.getAndroidID());
      	        
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
  	        
