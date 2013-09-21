@@ -35,6 +35,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -88,13 +89,13 @@ public class SamplingActivity extends FragmentActivity {
 		device = new DeviceInfo(this);
 		System.out.println(device.getRooted() + " " + device.getDebug() + " " + device.getUnknownSourcesAllowed() + " " + device.getAPILevel() + " " +  device.getApps().toString() + " " + device.getMACAddress() + " " +  device.getSerialNumber() + " " + device.getAndroidID());
 		
-	    String host = "197.175.59.185";
+	    String host = "192.168.1.100";
 	    String stringUrl = "http://"+ host + ":8080/BYOD/scanResults";
 	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         
         if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(stringUrl);
+            new DownloadWebpageTask(this).execute(stringUrl);
         } else {
            System.out.println("No network connection available.");
         }
@@ -102,6 +103,14 @@ public class SamplingActivity extends FragmentActivity {
 	}
 	
 	private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+		
+		FragmentActivity activity;
+		
+		public DownloadWebpageTask(FragmentActivity act)
+		{
+			activity = act;
+		}
+		
         @Override
         protected String doInBackground(String... urls) {
               
@@ -118,13 +127,14 @@ public class SamplingActivity extends FragmentActivity {
             System.out.println("result: " + result);
             if (result.startsWith("allowed"))
             {
-            	DialogFragment df = new AccessAllowedDialog();
-    			df.show(getSupportFragmentManager(), "MyDF");
+            	Intent intent = new Intent(activity, LoginActivity.class);
+        		startActivity(intent);		
             }
             else if (result.startsWith("denied"))
             {
-            	DialogFragment df = new AccessDeniedDialog();
-    			df.show(getSupportFragmentManager(), "MyDF");
+            	Intent intent = new Intent(activity, ScanResults.class);     		
+        	    intent.putExtra("result", result);
+        	    startActivity(intent);
 
             }
             	
@@ -153,6 +163,7 @@ public class SamplingActivity extends FragmentActivity {
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("POST");
 	        conn.setDoInput(true);
+	        conn.setDoOutput(true);
 	        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
 	        conn.connect();
 	        
@@ -177,7 +188,7 @@ public class SamplingActivity extends FragmentActivity {
  	        wr.flush();
 	        int response = conn.getResponseCode();
 	        System.out.println(response);
-	        //Log.d(DEBUG_TAG, "The response is: " + response);
+	        //Log.d("BYOD", "The response is: " + response);
 	        is = conn.getInputStream();
 
 	        // Convert the InputStream into a string

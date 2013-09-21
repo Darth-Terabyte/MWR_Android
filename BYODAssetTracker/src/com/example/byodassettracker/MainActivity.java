@@ -1,13 +1,24 @@
 package com.example.byodassettracker;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +26,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -29,6 +41,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import java.security.cert.X509Certificate;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 
 public class MainActivity extends FragmentActivity {
 	
@@ -40,60 +55,153 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
+		
+		try
+		{
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+			AssetManager assetManager = getAssets();
+			InputStream caInput = assetManager.open("ca.crt");		
+			Certificate ca;
+			try {
+			    ca = cf.generateCertificate(caInput);
+			    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+			} finally {
+			    caInput.close();
+			}
+			caInput = assetManager.open(".crt");		
+			// Create a KeyStore containing our trusted CAs
+			String keyStoreType = KeyStore.getDefaultType();
+			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+			keyStore.load(null, null);
+			keyStore.setCertificateEntry("ca", ca);
 
-		//check status of device
-		String host = "197.175.59.185";
-	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
-	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(stringUrl);
-        } else {
-           System.out.println("No network connection available.");
-        }
-        if (!isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.INVISIBLE);
+			// Create a TrustManager that trusts the CAs in our KeyStore
+			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+			tmf.init(keyStore);
+
+			// Create an SSLContext that uses our TrustManager
+			SSLContext context = SSLContext.getInstance("TLS");
+			context.init(null, tmf.getTrustManagers(), null);
+
+			// Tell the URLConnection to use a SocketFactory from our SSLContext
+			URL url = new URL("https://192.168.1.100:8181/BYOD/");
+			HttpsURLConnection urlConnection =
+			    (HttpsURLConnection)url.openConnection();
+			urlConnection.setSSLSocketFactory(context.getSocketFactory());
+			InputStream in = urlConnection.getInputStream();
+			copyInputStreamToOutputStream(in, System.out);
 		}
-		else if (isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.INVISIBLE);
-		}
-	}
-	
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-		String host = "197.175.59.185";
-	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
-	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(stringUrl);
-        } else {
-           System.out.println("No network connection available.");
-        }
-        if (!isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.INVISIBLE);
-			Button button2 = (Button) findViewById(R.id.register);		
-			button2.setVisibility(View.VISIBLE);
-		}
-		else if (isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.INVISIBLE);
-			Button button2 = (Button) findViewById(R.id.scan);		
-			button2.setVisibility(View.VISIBLE);
+		catch (Exception e){			
+			StringWriter sw = new StringWriter();
+    		e.printStackTrace(new PrintWriter(sw));
+    		String exceptionAsString = sw.toString();
+			DialogFragment df = new TokenDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("token", exceptionAsString);
+			df.setArguments(args);
 		}
 		
+		
+
+		//check status of device
+//		String host = "192.168.1.100";
+//	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
+//	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//        
+//        if (networkInfo != null && networkInfo.isConnected()) {
+//            new DownloadWebpageTask().execute(stringUrl);
+//        } else {
+//           System.out.println("No network connection available.");
+//        }
+//        if (!isRegistered)
+//		{
+//			Button button = (Button) findViewById(R.id.scan);		
+//			button.setVisibility(View.INVISIBLE);
+//		}
+//		else if (isRegistered)
+//		{
+//			Button button = (Button) findViewById(R.id.register);		
+//			button.setVisibility(View.INVISIBLE);
+//		}
 	}
+	
+    private static void copyInputStreamToOutputStream(InputStream in, PrintStream out) throws IOException {
+   //To change body of generated methods, choose Tools | Templates.
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+             out.write(buffer, 0, len);
+        }
+}
+//	
+//	@Override
+//	public void onResume()
+//	{
+//		super.onResume();
+//		
+//		
+//		
+////		String host = "192.168.1.100";
+////	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
+////	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+////        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+////        
+////        if (networkInfo != null && networkInfo.isConnected()) {
+////            new DownloadWebpageTask().execute(stringUrl);
+////        } else {
+////           System.out.println("No network connection available.");
+////        }
+////        if (!isRegistered)
+////		{
+////			Button button = (Button) findViewById(R.id.scan);		
+////			button.setVisibility(View.INVISIBLE);
+////			Button button2 = (Button) findViewById(R.id.register);		
+////			button2.setVisibility(View.VISIBLE);
+////		}
+////		else if (isRegistered)
+////		{
+////			Button button = (Button) findViewById(R.id.register);		
+////			button.setVisibility(View.INVISIBLE);
+////			Button button2 = (Button) findViewById(R.id.scan);		
+////			button2.setVisibility(View.VISIBLE);
+////		}
+//		
+//	}
+//	
+//	@Override
+//	public void onRestart()
+//	{
+//		super.onRestart();
+//		String host = "192.168.1.100";
+//	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
+//	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//        
+//        if (networkInfo != null && networkInfo.isConnected()) {
+//            new DownloadWebpageTask().execute(stringUrl);
+//        } else {
+//           System.out.println("No network connection available.");
+//        }
+//        if (!isRegistered)
+//		{
+//			Button button = (Button) findViewById(R.id.scan);		
+//			button.setVisibility(View.INVISIBLE);
+//			Button button2 = (Button) findViewById(R.id.register);		
+//			button2.setVisibility(View.VISIBLE);
+//		}
+//		else if (isRegistered)
+//		{
+//			Button button = (Button) findViewById(R.id.register);		
+//			button.setVisibility(View.INVISIBLE);
+//			Button button2 = (Button) findViewById(R.id.scan);		
+//			button2.setVisibility(View.VISIBLE);
+//		}
+		
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -169,6 +277,7 @@ public class MainActivity extends FragmentActivity {
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("POST");
 	        conn.setDoInput(true);
+	        conn.setDoOutput(true);
 	        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
 	        conn.connect();
 	        
@@ -177,7 +286,7 @@ public class MainActivity extends FragmentActivity {
         	JSONObject data = new JSONObject();
  	        try {
      	        //data.put("mac",device.getMACAddress());
- 	        	data.put("mac","mac");
+ 	        	data.put("mac",device.getMACAddress());
      	        data.put("serial", device.getSerialNumber());
      	        data.put("android",device.getAndroidID());
      	        

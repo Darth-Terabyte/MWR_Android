@@ -19,5 +19,6 @@
     <string name="sampling_progress">Checking device</string>
     <string name="title_activity_registration">Device Registration</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_scan_results">ScanResults</string>
 
 </resources>

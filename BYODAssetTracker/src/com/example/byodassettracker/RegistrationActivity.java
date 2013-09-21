@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -28,6 +30,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ScrollView;
 
 public class RegistrationActivity extends FragmentActivity {
 	
@@ -79,6 +82,7 @@ public class RegistrationActivity extends FragmentActivity {
 		password = editText.getText().toString();
 		editText = (EditText) findViewById(R.id.password2);		
 		String password2 = editText.getText().toString();
+		System.out.println(name);
 		if (!password.equals(password2))
 		{
 			DialogFragment df = new PasswordDialog();
@@ -97,7 +101,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        
 	        password = builder.toString();
 	        System.out.println(password);
-	        String host = "197.175.59.185";	     
+	        String host = "192.168.1.100";	     
 	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration";
 			
 	        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -109,7 +113,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        }
 	        
 	        //generate token
-	        String composite =mac+androidID+serial;
+	        String composite =device.getMACAddress()+device.getAndroidID()+device.getSerialNumber();
 	        hash = digester.digest(composite.getBytes());
 	        builder = new StringBuilder(2*hash.length);
 	        for (byte b : hash)
@@ -124,18 +128,14 @@ public class RegistrationActivity extends FragmentActivity {
 	        {
 	        	token += hashkey.charAt(index);
 	        	index += skip;
-	        }
-	        
+	        }	        
 	        
 	        DialogFragment df = new TokenDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
 			Bundle args = new Bundle();
 			args.putString("token", token);
 			df.setArguments(args);
-	        
-	        
-	        
-	        
+    
 		}
 
 		
@@ -176,26 +176,32 @@ public class RegistrationActivity extends FragmentActivity {
 	    // Only display the first 500 characters of the retrieved
 	    // web page content.
 	    int len = 500;
+	    String contentAsString = "";
 	        
 	    try {
-	        URL url = new URL(myurl);	        
-	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-	        conn.setReadTimeout(10000 /* milliseconds */);
-	        conn.setConnectTimeout(15000 /* milliseconds */);
-	        conn.setRequestMethod("POST");
-	        conn.setDoInput(true);
-	        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
-	        // Starts the query
-	        conn.connect();
-	        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+	    	try
+	    	{
+	        	URL url = new URL(myurl);	        
+		        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		        conn.setReadTimeout(10000 /* milliseconds */);
+		        conn.setConnectTimeout(15000 /* milliseconds */);
+		        conn.setRequestMethod("POST");
+		        conn.setDoInput(true);
+		        conn.setDoOutput(true);
+		        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
+		        // Starts the query
+		        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+	        
+	    	
 	      
         	JSONObject data = new JSONObject();
  	        try {
 				//data.put("make", man);
- 	        	data.put("make", "man");
+ 	        	data.put("make", man);
      	        data.put("model", model);
-     	        //data.put("mac", device.getMACAddress());
-     	       data.put("mac", "mac");
+     	        data.put("mac", device.getMACAddress());
+     	       //data.put("mac", "mac");
      	        data.put("serial", device.getSerialNumber());
      	        data.put("android", device.getAndroidID());
      	        data.put("username", username);
@@ -212,19 +218,35 @@ public class RegistrationActivity extends FragmentActivity {
  	        wr.write(data.toString());
             wr.flush();
 	        int response = conn.getResponseCode();
+	        
 	        //Log.d(DEBUG_TAG, "The response is: " + response);
 	        is = conn.getInputStream();
 
 	        // Convert the InputStream into a string
-	        String contentAsString = readIt(is, len);
-	        return contentAsString;
+	        contentAsString = readIt(is, len);
 	        
+	    	}
+	    	catch (Exception e)
+	    	{
+	    		StringWriter sw = new StringWriter();
+	    		e.printStackTrace(new PrintWriter(sw));
+	    		String exceptionAsString = sw.toString();
+	    		DialogFragment df = new TokenDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("token", exceptionAsString);
+				df.setArguments(args);
+	    	}
+	    	return contentAsString;
 	    // Makes sure that the InputStream is closed after the app is
 	    // finished using it.
 	    } finally {
-	        if (is != null) {
+	    	
+	        if (is != null) {	        	
 	            is.close();
-	        } 
+	        }
+
+	        
 	    }
 	}
 	
