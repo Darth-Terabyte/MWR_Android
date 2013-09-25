@@ -12,8 +12,12 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -56,77 +60,87 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		
-		try
-		{
-			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			// From https://www.washington.edu/itconnect/security/ca/load-der.crt
-			AssetManager assetManager = getAssets();
-			InputStream caInput = assetManager.open("ca.crt");		
-			Certificate ca;
-			try {
-			    ca = cf.generateCertificate(caInput);
-			    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-			} finally {
-			    caInput.close();
-			}
-			caInput = assetManager.open(".crt");		
-			// Create a KeyStore containing our trusted CAs
-			String keyStoreType = KeyStore.getDefaultType();
-			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-			keyStore.load(null, null);
-			keyStore.setCertificateEntry("ca", ca);
-
-			// Create a TrustManager that trusts the CAs in our KeyStore
-			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-			tmf.init(keyStore);
-
-			// Create an SSLContext that uses our TrustManager
-			SSLContext context = SSLContext.getInstance("TLS");
-			context.init(null, tmf.getTrustManagers(), null);
-
-			// Tell the URLConnection to use a SocketFactory from our SSLContext
-			URL url = new URL("https://192.168.1.100:8181/BYOD/");
-			HttpsURLConnection urlConnection =
-			    (HttpsURLConnection)url.openConnection();
-			urlConnection.setSSLSocketFactory(context.getSocketFactory());
-			InputStream in = urlConnection.getInputStream();
-			copyInputStreamToOutputStream(in, System.out);
-		}
-		catch (Exception e){			
-			StringWriter sw = new StringWriter();
-    		e.printStackTrace(new PrintWriter(sw));
-    		String exceptionAsString = sw.toString();
-			DialogFragment df = new TokenDialog();
-			df.show(getSupportFragmentManager(), "MyDF");
-			Bundle args = new Bundle();
-			args.putString("token", exceptionAsString);
-			df.setArguments(args);
-		}
+//		try
+//		{
+//			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+//			// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+//			AssetManager assetManager = getAssets();
+//			InputStream caInput = assetManager.open("mwr.cer");		
+//			Certificate ca;
+//			try {
+//			    ca = cf.generateCertificate(caInput);
+//			    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+//			} finally {
+//			    caInput.close();
+//			}		
+//			// Create a KeyStore containing our trusted CAs
+//			String keyStoreType = KeyStore.getDefaultType();
+//			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+//			keyStore.load(null, null);
+//			keyStore.setCertificateEntry("s1as", ca);
+//
+//			// Create a TrustManager that trusts the CAs in our KeyStore
+//			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+//			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+//			tmf.init(keyStore);
+//
+//			// Create an SSLContext that uses our TrustManager
+//			SSLContext context = SSLContext.getInstance("TLS");
+//			context.init(null, tmf.getTrustManagers(), null);
+//
+//			// Tell the URLConnection to use a SocketFactory from our SSLContext
+//			URL url = new URL("https://www.mwr.com:8181/BYOD");
+//			HttpsURLConnection urlConnection =
+//			    (HttpsURLConnection)url.openConnection();
+//			urlConnection.setSSLSocketFactory(context.getSocketFactory());
+//			InputStream in = urlConnection.getInputStream();
+//			copyInputStreamToOutputStream(in, System.out);
+//		}
+//		catch (Exception e){			
+//			StringWriter sw = new StringWriter();
+//    		e.printStackTrace(new PrintWriter(sw));
+//    		String exceptionAsString = sw.toString();
+//			DialogFragment df = new TokenDialog();
+//			df.show(getSupportFragmentManager(), "MyDF");
+//			Bundle args = new Bundle();
+//			args.putString("token", exceptionAsString);
+//			df.setArguments(args);
+//		}
 		
-		
+		try{
 
 		//check status of device
-//		String host = "192.168.1.100";
-//	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
-//	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-//        
-//        if (networkInfo != null && networkInfo.isConnected()) {
-//            new DownloadWebpageTask().execute(stringUrl);
-//        } else {
-//           System.out.println("No network connection available.");
-//        }
-//        if (!isRegistered)
-//		{
-//			Button button = (Button) findViewById(R.id.scan);		
-//			button.setVisibility(View.INVISIBLE);
-//		}
-//		else if (isRegistered)
-//		{
-//			Button button = (Button) findViewById(R.id.register);		
-//			button.setVisibility(View.INVISIBLE);
-//		}
+		String host = "www.mwr.com";
+	    String stringUrl = "https://"+ host + ":8181/BYOD/status";
+	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadWebpageTask().execute(stringUrl);
+        } else {
+           System.out.println("No network connection available.");
+        }
+        if (!isRegistered)
+		{
+			Button button = (Button) findViewById(R.id.scan);		
+			button.setVisibility(View.INVISIBLE);
+		}
+		else if (isRegistered)
+		{
+			Button button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.INVISIBLE);
+		}
+		}
+		catch (Exception e){			
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		String exceptionAsString = sw.toString();
+		DialogFragment df = new TokenDialog();
+		df.show(getSupportFragmentManager(), "MyDF");
+		Bundle args = new Bundle();
+		args.putString("token", exceptionAsString);
+		df.setArguments(args);
+	}
 	}
 	
     private static void copyInputStreamToOutputStream(InputStream in, PrintStream out) throws IOException {
@@ -137,71 +151,99 @@ public class MainActivity extends FragmentActivity {
              out.write(buffer, 0, len);
         }
 }
-//	
-//	@Override
-//	public void onResume()
-//	{
-//		super.onResume();
-//		
-//		
-//		
-////		String host = "192.168.1.100";
-////	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
-////	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-////        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-////        
-////        if (networkInfo != null && networkInfo.isConnected()) {
-////            new DownloadWebpageTask().execute(stringUrl);
-////        } else {
-////           System.out.println("No network connection available.");
-////        }
-////        if (!isRegistered)
-////		{
-////			Button button = (Button) findViewById(R.id.scan);		
-////			button.setVisibility(View.INVISIBLE);
-////			Button button2 = (Button) findViewById(R.id.register);		
-////			button2.setVisibility(View.VISIBLE);
-////		}
-////		else if (isRegistered)
-////		{
-////			Button button = (Button) findViewById(R.id.register);		
-////			button.setVisibility(View.INVISIBLE);
-////			Button button2 = (Button) findViewById(R.id.scan);		
-////			button2.setVisibility(View.VISIBLE);
-////		}
-//		
-//	}
-//	
-//	@Override
-//	public void onRestart()
-//	{
-//		super.onRestart();
-//		String host = "192.168.1.100";
-//	    String stringUrl = "http://"+ host + ":8080/BYOD/status";
-//	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-//        
-//        if (networkInfo != null && networkInfo.isConnected()) {
-//            new DownloadWebpageTask().execute(stringUrl);
-//        } else {
-//           System.out.println("No network connection available.");
-//        }
-//        if (!isRegistered)
-//		{
-//			Button button = (Button) findViewById(R.id.scan);		
-//			button.setVisibility(View.INVISIBLE);
-//			Button button2 = (Button) findViewById(R.id.register);		
-//			button2.setVisibility(View.VISIBLE);
-//		}
-//		else if (isRegistered)
-//		{
-//			Button button = (Button) findViewById(R.id.register);		
-//			button.setVisibility(View.INVISIBLE);
-//			Button button2 = (Button) findViewById(R.id.scan);		
-//			button2.setVisibility(View.VISIBLE);
-//		}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
 		
-//	}
+		
+		
+		try{
+
+		//check status of device
+		String host = "www.mwr.com";
+	    String stringUrl = "https://"+ host + ":8181/BYOD/status";
+	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadWebpageTask().execute(stringUrl);
+        } else {
+           System.out.println("No network connection available.");
+        }
+        if (!isRegistered)
+		{
+			Button button = (Button) findViewById(R.id.scan);		
+			button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.VISIBLE);
+		}
+		else if (isRegistered)
+		{
+			Button button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.scan);		
+			button.setVisibility(View.VISIBLE);
+		}
+		}
+		catch (Exception e){			
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		String exceptionAsString = sw.toString();
+		DialogFragment df = new TokenDialog();
+		df.show(getSupportFragmentManager(), "MyDF");
+		Bundle args = new Bundle();
+		args.putString("token", exceptionAsString);
+		df.setArguments(args);
+	}
+		
+	}
+	
+	@Override
+	public void onRestart()
+	{
+		super.onRestart();
+		try{
+
+		//check status of device
+		String host = "www.mwr.com";
+	    String stringUrl = "https://"+ host + ":8181/BYOD/status";
+	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadWebpageTask().execute(stringUrl);
+        } else {
+           System.out.println("No network connection available.");
+        }
+        if (!isRegistered)
+		{
+        	Button button = (Button) findViewById(R.id.scan);		
+			button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.VISIBLE);
+		}
+		else if (isRegistered)
+		{
+			Button button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.scan);		
+			button.setVisibility(View.VISIBLE);
+		}
+		}
+		catch (Exception e){			
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		String exceptionAsString = sw.toString();
+		DialogFragment df = new TokenDialog();
+		df.show(getSupportFragmentManager(), "MyDF");
+		Bundle args = new Bundle();
+		args.putString("token", exceptionAsString);
+		df.setArguments(args);
+	}
+		
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -230,8 +272,61 @@ public class MainActivity extends FragmentActivity {
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
+            	StringWriter sw = new StringWriter();
+        		e.printStackTrace(new PrintWriter(sw));
+        		String exceptionAsString = sw.toString();
+        		DialogFragment df = new TokenDialog();
+        		df.show(getSupportFragmentManager(), "MyDF");
+        		Bundle args = new Bundle();
+        		args.putString("token", exceptionAsString);
+        		df.setArguments(args);
                 return "Unable to retrieve web page. URL may be invalid.";
-            }
+            } catch (KeyManagementException e) {
+            	StringWriter sw = new StringWriter();
+        		e.printStackTrace(new PrintWriter(sw));
+        		String exceptionAsString = sw.toString();
+        		DialogFragment df = new TokenDialog();
+        		df.show(getSupportFragmentManager(), "MyDF");
+        		Bundle args = new Bundle();
+        		args.putString("token", exceptionAsString);
+        		df.setArguments(args);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CertificateException e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				DialogFragment df = new TokenDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("token", exceptionAsString);
+				df.setArguments(args);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (KeyStoreException e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				DialogFragment df = new TokenDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("token", exceptionAsString);
+				df.setArguments(args);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				DialogFragment df = new TokenDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("token", exceptionAsString);
+				df.setArguments(args);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            return "";
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -266,13 +361,44 @@ public class MainActivity extends FragmentActivity {
 	// Given a URL, establishes an HttpUrlConnection and retrieves
 	// the web page content as a InputStream, which it returns as
 	// a string.
-	private String downloadUrl(String myurl) throws IOException {
+	private String downloadUrl(String myurl) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 	    InputStream is = null;
 	    int len = 500;
 	        
 	    try {
-	        URL url = new URL(myurl);
-	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	    	
+	    	
+	    	
+	    	CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+			AssetManager assetManager = getAssets();
+			InputStream caInput = assetManager.open("mwr.cer");		
+			Certificate ca;
+			try {
+			    ca = cf.generateCertificate(caInput);
+			    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+			} finally {
+			    caInput.close();
+			}		
+			// Create a KeyStore containing our trusted CAs
+			String keyStoreType = KeyStore.getDefaultType();
+			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+			keyStore.load(null, null);
+			keyStore.setCertificateEntry("s1as", ca);
+
+			// Create a TrustManager that trusts the CAs in our KeyStore
+			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+			tmf.init(keyStore);
+
+			// Create an SSLContext that uses our TrustManager
+			SSLContext context = SSLContext.getInstance("TLS");
+			context.init(null, tmf.getTrustManagers(), null);
+
+			// Tell the URLConnection to use a SocketFactory from our SSLContext
+			URL url = new URL(myurl);
+			HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+			conn.setSSLSocketFactory(context.getSocketFactory());
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("POST");
@@ -312,6 +438,7 @@ public class MainActivity extends FragmentActivity {
 	            is.close();
 	        } 
 	    }
+	    
 	}
 
 	

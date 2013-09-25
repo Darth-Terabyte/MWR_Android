@@ -11,13 +11,22 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -91,7 +100,9 @@ public class RegistrationActivity extends FragmentActivity {
 		else
 		{
 			//md5 hash password
-			MessageDigest digester = MessageDigest.getInstance("MD5");
+			try
+			{
+				MessageDigest digester = MessageDigest.getInstance("MD5");
 	        byte[] hash = digester.digest(password.getBytes());
 	        StringBuilder builder = new StringBuilder(2*hash.length);
 	        for (byte b : hash)
@@ -101,8 +112,8 @@ public class RegistrationActivity extends FragmentActivity {
 	        
 	        password = builder.toString();
 	        System.out.println(password);
-	        String host = "192.168.1.100";	     
-	        String stringUrl = "http://"+ host + ":8080/BYOD/requestRegistration";
+	        String host = "www.mwr.com";	     
+	        String stringUrl = "https://"+ host + ":8181/BYOD/requestRegistration";
 			
 	        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -112,30 +123,32 @@ public class RegistrationActivity extends FragmentActivity {
 	           System.out.println("No network connection available.");
 	        }
 	        
+	        //save password in db
+	        getApplicationContext().deleteDatabase("user_db");
+	        DatabaseHandler db = new DatabaseHandler(this);
+			db.addUser(password); 
+	        System.out.println(db.getUserCount());
 	        //generate token
-	        String composite =device.getMACAddress()+device.getAndroidID()+device.getSerialNumber();
-	        hash = digester.digest(composite.getBytes());
-	        builder = new StringBuilder(2*hash.length);
-	        for (byte b : hash)
-	        {
-	            builder.append(String.format("%02x",b&0xff));
-	        }
-	        String hashkey = builder.toString();
-	        int skip = Math.round((float)hashkey.length()/5);
-	        int index = 0;
-	        String token = "";
-	        for (int i=0;i<5;i++)
-	        {
-	        	token += hashkey.charAt(index);
-	        	index += skip;
-	        }	        
-	        
+	        TokenGenerator   tokenGen = new TokenGenerator();
+	        String token =    tokenGen.generateToken(device.getMACAddress(), device.getAndroidID(),device.getSerialNumber(), password);	        
 	        DialogFragment df = new TokenDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
 			Bundle args = new Bundle();
 			args.putString("token", token);
 			df.setArguments(args);
-    
+		}
+			catch (Exception e)
+	    	{
+	    		StringWriter sw = new StringWriter();
+	    		e.printStackTrace(new PrintWriter(sw));
+	    		String exceptionAsString = sw.toString();
+	    		DialogFragment df = new TokenDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("token", exceptionAsString);
+				df.setArguments(args);
+	    	}
+			
 		}
 
 		
@@ -181,20 +194,45 @@ public class RegistrationActivity extends FragmentActivity {
 	    try {
 	    	try
 	    	{
-	        	URL url = new URL(myurl);	        
-		        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	    		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+				AssetManager assetManager = getAssets();
+				InputStream caInput = assetManager.open("mwr.cer");		
+				Certificate ca;
+				try {
+				    ca = cf.generateCertificate(caInput);
+				    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+				} finally {
+				    caInput.close();
+				}		
+				// Create a KeyStore containing our trusted CAs
+				String keyStoreType = KeyStore.getDefaultType();
+				KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+				keyStore.load(null, null);
+				keyStore.setCertificateEntry("s1as", ca);
+
+				// Create a TrustManager that trusts the CAs in our KeyStore
+				String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+				tmf.init(keyStore);
+
+				// Create an SSLContext that uses our TrustManager
+				SSLContext context = SSLContext.getInstance("TLS");
+				context.init(null, tmf.getTrustManagers(), null);
+
+				// Tell the URLConnection to use a SocketFactory from our SSLContext
+				URL url = new URL(myurl);
+				HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+				conn.setSSLSocketFactory(context.getSocketFactory());
 		        conn.setReadTimeout(10000 /* milliseconds */);
 		        conn.setConnectTimeout(15000 /* milliseconds */);
 		        conn.setRequestMethod("POST");
 		        conn.setDoInput(true);
 		        conn.setDoOutput(true);
 		        conn.setRequestProperty("content-type","application/json; charset=utf-8"); 
-		        // Starts the query
+		        conn.connect();
 		        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
-	        
-	    	
-	      
         	JSONObject data = new JSONObject();
  	        try {
 				//data.put("make", man);
