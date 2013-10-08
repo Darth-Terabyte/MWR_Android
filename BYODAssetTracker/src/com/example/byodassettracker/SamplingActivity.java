@@ -98,6 +98,7 @@ public class SamplingActivity extends FragmentActivity {
 	
 	public void sample()
 	{		
+		
 		device = new DeviceInfo(this);
 		db = new DatabaseHandler(this);
 		System.out.println(device.getRooted() + " " + device.getDebug() + " " + device.getUnknownSourcesAllowed() + " " + device.getAPILevel() + " " +  device.getApps().toString() + " " + device.getMACAddress() + " " +  device.getSerialNumber() + " " + device.getAndroidID());

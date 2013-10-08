@@ -114,22 +114,19 @@ public class MainActivity extends FragmentActivity {
 	    String stringUrl = "https://"+ host + ":8181/BYOD/status";
 	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        Button button = (Button) findViewById(R.id.scan);		
+		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.register);		
+		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.token);		
+		button.setVisibility(View.INVISIBLE);
         
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadWebpageTask().execute(stringUrl);
         } else {
            System.out.println("No network connection available.");
         }
-        if (!isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.INVISIBLE);
-		}
-		else if (isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.INVISIBLE);
-		}
+
 		}
 		catch (Exception e){			
 		StringWriter sw = new StringWriter();
@@ -172,20 +169,12 @@ public class MainActivity extends FragmentActivity {
         } else {
            System.out.println("No network connection available.");
         }
-        if (!isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.INVISIBLE);
-			button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.VISIBLE);
-		}
-		else if (isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.INVISIBLE);
-			button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.VISIBLE);
-		}
+        Button button = (Button) findViewById(R.id.scan);		
+        button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.register);		
+		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.token);		
+		button.setVisibility(View.INVISIBLE);
 		}
 		catch (Exception e){			
 		StringWriter sw = new StringWriter();
@@ -217,20 +206,12 @@ public class MainActivity extends FragmentActivity {
         } else {
            System.out.println("No network connection available.");
         }
-        if (!isRegistered)
-		{
-        	Button button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.INVISIBLE);
-			button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.VISIBLE);
-		}
-		else if (isRegistered)
-		{
-			Button button = (Button) findViewById(R.id.register);		
-			button.setVisibility(View.INVISIBLE);
-			button = (Button) findViewById(R.id.scan);		
-			button.setVisibility(View.VISIBLE);
-		}
+        Button button = (Button) findViewById(R.id.scan);		
+        button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.register);		
+		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.token);		
+		button.setVisibility(View.INVISIBLE);
 		}
 		catch (Exception e){			
 		StringWriter sw = new StringWriter();
@@ -262,6 +243,24 @@ public class MainActivity extends FragmentActivity {
 	{
 		Intent intent = new Intent(this, SamplingActivity.class);
 		startActivity(intent);
+	}
+	
+	public void viewToken(View view)
+	{
+		 TokenGenerator   tokenGen = new TokenGenerator();
+		 DatabaseHandler db = new DatabaseHandler(this);
+	     String token = "";
+		try {
+			token = tokenGen.generateToken(device.getMACAddress(), device.getAndroidID(),device.getSerialNumber(), db.getPassword(1));
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	        
+	     DialogFragment df = new TokenDialog();
+	     df.show(getSupportFragmentManager(), "MyDF");
+	     Bundle args = new Bundle();
+	     args.putString("token", token);
+	     df.setArguments(args);
 	}
 
 	private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
@@ -334,18 +333,30 @@ public class MainActivity extends FragmentActivity {
             System.out.println("result: " + result);
             if (result.startsWith("registered"))
             {
-            	isRegistered = true;
-            	isWaiting = false;
+            	Button button = (Button) findViewById(R.id.scan);		
+                button.setVisibility(View.VISIBLE);
+        		button = (Button) findViewById(R.id.register);		
+        		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.token);		
+        		button.setVisibility(View.INVISIBLE);
             }
             else if (result.startsWith("not registered"))
             {
-            	isRegistered = false;
-            	isWaiting = false;
+            	Button button = (Button) findViewById(R.id.scan);		
+                button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.register);		
+        		button.setVisibility(View.VISIBLE);
+        		button = (Button) findViewById(R.id.token);		
+        		button.setVisibility(View.INVISIBLE);
             }
             else if (result.startsWith("waiting"))
             {
-            	isRegistered = false;
-            	isWaiting = true;
+            	Button button = (Button) findViewById(R.id.scan);		
+                button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.register);		
+        		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.token);		
+        		button.setVisibility(View.VISIBLE);
             }            	
        }
     }

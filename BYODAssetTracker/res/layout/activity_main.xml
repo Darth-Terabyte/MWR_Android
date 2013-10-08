@@ -26,4 +26,12 @@
         android:onClick="sample"
         android:text="Scan" />
 
+    <Button
+        android:id="@+id/token"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="View token" 
+         android:onClick="viewToken"/>
+
 </LinearLayout>

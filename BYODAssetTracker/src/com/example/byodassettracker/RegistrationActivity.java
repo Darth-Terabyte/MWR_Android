@@ -124,10 +124,11 @@ public class RegistrationActivity extends FragmentActivity {
 	        }
 	        
 	        //save password in db
+	        getApplicationContext().openOrCreateDatabase("user_db", MODE_PRIVATE, null);
 	        getApplicationContext().deleteDatabase("user_db");
 	        DatabaseHandler db = new DatabaseHandler(this);
 			db.addUser(password); 
-	        System.out.println(db.getUserCount());
+	        //System.out.println(db.getUserCount());
 	        //generate token
 	        TokenGenerator   tokenGen = new TokenGenerator();
 	        String token =    tokenGen.generateToken(device.getMACAddress(), device.getAndroidID(),device.getSerialNumber(), password);	        

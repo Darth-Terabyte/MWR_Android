@@ -33,7 +33,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-    	 db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+    	//deleteAllData();
+    	db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_PASSWORD + " TEXT)";
        
@@ -94,6 +95,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
  
         // return count
         return cursor.getCount();
+    }
+    
+    void deleteAllData()
+    {
+        SQLiteDatabase sdb= this.getWritableDatabase();
+        sdb.delete("user_db", null, null);
+
     }
  
 }
