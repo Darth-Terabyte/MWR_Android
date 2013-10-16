@@ -12,15 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="17dp"
-        android:text="@string/registration"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
+   
     <EditText
         android:id="@+id/name"
         android:layout_width="match_parent"
@@ -84,7 +76,12 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
         android:text="@string/register"
-        android:onClick="register" />
+        android:onClick="register" 
+       	android:background="#59BADD"
+       	android:textColor="#002060"
+       	 android:width="80dp" 
+        android:gravity="center"
+        android:height="40dp"/>
 
 </LinearLayout>
 </ScrollView>

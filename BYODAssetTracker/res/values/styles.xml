@@ -5,6 +5,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
+   
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in
@@ -22,6 +23,32 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">16dp</item>
+    </style>
+    
+    <color name="custom_theme_color">#4F81BD</color>
+	<style name="CustomTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <item name="android:windowBackground">@color/custom_theme_color</item>
+    <item name="android:colorBackground">@color/custom_theme_color</item>
+    <item name="android:actionBarStyle">@style/Theme.MyAppTheme.ActionBar</item>
+     <item name="android:editTextStyle">@style/editStyle</item>
+    </style>
+
+    <style name="Theme.MyAppTheme.ActionBar" parent="@android:style/Widget.Holo.ActionBar">
+       <item name="android:background">#FFFFFF</item>
+       <item name="android:titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
+   </style>
+   
+    <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    <item name="android:textColor">#002060</item>
+  </style>
+  <style name="editStyle">
+        <item name="android:background">#FFFFFF</item>
+         <item name="android:textColor">#002060</item>
+         <item name="android:textColorHint">#002060</item>
+         <item name="android:layout_marginTop">17dp</item>
+         <item name="android:textSize">16sp</item>
+
+
     </style>
 
 </resources>

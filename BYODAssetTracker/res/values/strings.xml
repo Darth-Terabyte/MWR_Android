@@ -15,10 +15,14 @@
     <string name="password_mismatch">The passwords you have entered do not match. Please re-enter your password</string>
     <string name="title_activity_scan">Anti-virus Scan</string>
     <string name="download">This device does not have AVG Anti-virus installed</string>
-    <string name="title_activity_sampling">Device Sampling</string>
+    <string name="title_activity_sampling">Device Scan</string>
     <string name="sampling_progress">Checking device</string>
     <string name="title_activity_registration">Device Registration</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_scan_results">ScanResults</string>
+    <string name="title_activity_test">Test</string>
+    <string name="title_activity_test2">Test2</string>
+    <string name="title_activity_new_theme">NewTheme</string>
+    <string name="title_activity_new2">New2</string>
 
 </resources>

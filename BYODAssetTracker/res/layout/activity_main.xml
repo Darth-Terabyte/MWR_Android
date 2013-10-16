@@ -16,7 +16,9 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
         android:text="@string/register"
-        android:onClick="register" />
+        android:onClick="register" 
+        android:minHeight="100dp"
+        android:minWidth="200dp"/>
 
     <Button
         android:id="@+id/scan"
@@ -24,7 +26,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:onClick="sample"
-        android:text="Scan" />
+        android:text="Scan" 
+        android:minHeight="100dp"
+        android:minWidth="200dp"/>
 
     <Button
         android:id="@+id/token"
@@ -32,6 +36,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="View token" 
-         android:onClick="viewToken"/>
+         android:onClick="viewToken"
+         android:minHeight="100dp"
+        android:minWidth="200dp"/>
+    
+    
 
 </LinearLayout>

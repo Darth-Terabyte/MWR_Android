@@ -60,52 +60,7 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		
-//		try
-//		{
-//			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//			// From https://www.washington.edu/itconnect/security/ca/load-der.crt
-//			AssetManager assetManager = getAssets();
-//			InputStream caInput = assetManager.open("mwr.cer");		
-//			Certificate ca;
-//			try {
-//			    ca = cf.generateCertificate(caInput);
-//			    System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-//			} finally {
-//			    caInput.close();
-//			}		
-//			// Create a KeyStore containing our trusted CAs
-//			String keyStoreType = KeyStore.getDefaultType();
-//			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-//			keyStore.load(null, null);
-//			keyStore.setCertificateEntry("s1as", ca);
-//
-//			// Create a TrustManager that trusts the CAs in our KeyStore
-//			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-//			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-//			tmf.init(keyStore);
-//
-//			// Create an SSLContext that uses our TrustManager
-//			SSLContext context = SSLContext.getInstance("TLS");
-//			context.init(null, tmf.getTrustManagers(), null);
-//
-//			// Tell the URLConnection to use a SocketFactory from our SSLContext
-//			URL url = new URL("https://www.mwr.com:8181/BYOD");
-//			HttpsURLConnection urlConnection =
-//			    (HttpsURLConnection)url.openConnection();
-//			urlConnection.setSSLSocketFactory(context.getSocketFactory());
-//			InputStream in = urlConnection.getInputStream();
-//			copyInputStreamToOutputStream(in, System.out);
-//		}
-//		catch (Exception e){			
-//			StringWriter sw = new StringWriter();
-//    		e.printStackTrace(new PrintWriter(sw));
-//    		String exceptionAsString = sw.toString();
-//			DialogFragment df = new TokenDialog();
-//			df.show(getSupportFragmentManager(), "MyDF");
-//			Bundle args = new Bundle();
-//			args.putString("token", exceptionAsString);
-//			df.setArguments(args);
-//		}
+
 		
 		try{
 
@@ -245,6 +200,8 @@ public class MainActivity extends FragmentActivity {
 		startActivity(intent);
 	}
 	
+	
+	
 	public void viewToken(View view)
 	{
 		 TokenGenerator   tokenGen = new TokenGenerator();
@@ -330,7 +287,8 @@ public class MainActivity extends FragmentActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            System.out.println("result: " + result);
+            System.out.println("result: " + result);       
+            result = "waiting";
             if (result.startsWith("registered"))
             {
             	Button button = (Button) findViewById(R.id.scan);		
