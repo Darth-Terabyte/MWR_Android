@@ -1,6 +1,11 @@
 package com.example.byodassettracker;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +17,10 @@ import android.content.pm.ResolveInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 
 
@@ -34,13 +41,18 @@ public class DeviceInfo {
 public DeviceInfo(FragmentActivity act)
 {
 	activity = act;
+	
+	setMAC();
+	setSerial();
+	setAndroidID();
+}
+
+public void scan()
+{
 	setAppList();
 	checkRooted();
 	checkDebug();
 	checkUnknown();
-	setMAC();
-	setSerial();
-	setAndroidID();
 }
 
 	public ArrayList<String> getApps()
@@ -88,14 +100,16 @@ public DeviceInfo(FragmentActivity act)
 	    
 			File file = new File("/system/xbin/su");  
 	        rooted = file.exists();
-	       
-	        if (!rooted)
+	       if (rooted)
+	    	   return;
+	       else if (!rooted)
 	        {
 	        	for (int i=0;i<installedApps.size();i++)
 	        	{
 	        		if (installedApps.get(i).toLowerCase().equals("superuser"))
 			        {
 			        	rooted = true;
+			        	return;
 			        }      
 			        else if (installedApps.get(i).contains("AVG"))
 			        	avInstalled = true;
@@ -103,6 +117,41 @@ public DeviceInfo(FragmentActivity act)
 	        	}
 	        	
 	        }
+	        
+	        
+//	        ArrayList<String> commandLine = new ArrayList<String>();
+//	        commandLine.add("ls -l -a /system/bin/");
+//	        commandLine.add("ls -l -a /system/xbin/");
+//	        Process process = null;
+//	        BufferedReader bufferedReader = null;
+//	        for(int i=0; i< commandLine.size(); i++){
+//	        	try {
+//					process = Runtime.getRuntime().exec(commandLine.get(i));
+//				} catch (IOException e) {
+//					DialogFragment df = new TokenDialog();
+//					Bundle args = new Bundle();
+//					args.putString("token", "Can not execute.");
+//					df.setArguments(args);
+//				}
+//	        	bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//	        	try {
+//	        		String input = bufferedReader.readLine();
+//					while(input != null){
+//						String[] parts = input.split(" ");
+//						if(parts[0].contains("s"))
+//						{
+//							rooted = true;
+//							return;
+//						}
+//							
+//					}
+//				} catch (IOException e) {
+//					DialogFragment df = new TokenDialog();
+//					Bundle args = new Bundle();
+//					args.putString("token", "can not read output from command.");
+//					df.setArguments(args);
+//				}
+//	        }
 	     
 	}
 	

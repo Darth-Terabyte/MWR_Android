@@ -36,6 +36,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -75,6 +76,8 @@ public class MainActivity extends FragmentActivity {
 		button.setVisibility(View.INVISIBLE);
 		button = (Button) findViewById(R.id.token);		
 		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.logout);		
+		button.setVisibility(View.INVISIBLE);
         
         if (networkInfo != null && networkInfo.isConnected()) {
             new DownloadWebpageTask().execute(stringUrl);
@@ -95,6 +98,14 @@ public class MainActivity extends FragmentActivity {
 	}
 	}
 	
+	@Override
+    public void onBackPressed() {
+		Intent main = new Intent(Intent.ACTION_MAIN);
+		main.addCategory(Intent.CATEGORY_HOME);
+		main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(main);	
+    }
+	
     private static void copyInputStreamToOutputStream(InputStream in, PrintStream out) throws IOException {
    //To change body of generated methods, choose Tools | Templates.
         byte[] buffer = new byte[1024];
@@ -103,6 +114,8 @@ public class MainActivity extends FragmentActivity {
              out.write(buffer, 0, len);
         }
 }
+    
+    
 	
 	@Override
 	public void onResume()
@@ -129,6 +142,8 @@ public class MainActivity extends FragmentActivity {
 		button = (Button) findViewById(R.id.register);		
 		button.setVisibility(View.INVISIBLE);
 		button = (Button) findViewById(R.id.token);		
+		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.logout);		
 		button.setVisibility(View.INVISIBLE);
 		}
 		catch (Exception e){			
@@ -167,6 +182,8 @@ public class MainActivity extends FragmentActivity {
 		button.setVisibility(View.INVISIBLE);
 		button = (Button) findViewById(R.id.token);		
 		button.setVisibility(View.INVISIBLE);
+		button = (Button) findViewById(R.id.logout);		
+		button.setVisibility(View.INVISIBLE);
 		}
 		catch (Exception e){			
 		StringWriter sw = new StringWriter();
@@ -180,12 +197,51 @@ public class MainActivity extends FragmentActivity {
 	}
 		
 	}
+	
+	public void refresh()
+	{
+		
+		System.out.println("Refresh");
+			//check status of device
+			String host = "www.mwr.com";
+		    String stringUrl = "https://"+ host + ":8181/BYOD/status";
+		    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+	        
+	        if (networkInfo != null && networkInfo.isConnected()) {
+	            new DownloadWebpageTask().execute(stringUrl);
+	        } else {
+	           System.out.println("No network connection available.");
+	        }
+	        Button button = (Button) findViewById(R.id.scan);		
+	        button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.register);		
+			button.setVisibility(View.INVISIBLE);
+			button = (Button) findViewById(R.id.token);		
+			button.setVisibility(View.INVISIBLE);
+
+	}
+	
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.refreshView:
+	            refresh();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	        
+	    }
 	}
 	
 	public void register(View view)
@@ -198,6 +254,21 @@ public class MainActivity extends FragmentActivity {
 	{
 		Intent intent = new Intent(this, SamplingActivity.class);
 		startActivity(intent);
+	}
+	
+	public void logout(View view)
+	{
+		String host = "www.mwr.com";
+	    String stringUrl = "https://"+ host + ":8181/BYOD/mobileLogout";
+	    ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadWebpageTask().execute(stringUrl);
+        } else {
+           System.out.println("No network connection available.");
+        }
+        refresh();
 	}
 	
 	
@@ -287,8 +358,9 @@ public class MainActivity extends FragmentActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
+        	
             System.out.println("result: " + result);       
-            result = "waiting";
+           
             if (result.startsWith("registered"))
             {
             	Button button = (Button) findViewById(R.id.scan);		
@@ -296,6 +368,8 @@ public class MainActivity extends FragmentActivity {
         		button = (Button) findViewById(R.id.register);		
         		button.setVisibility(View.INVISIBLE);
         		button = (Button) findViewById(R.id.token);		
+        		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.logout);		
         		button.setVisibility(View.INVISIBLE);
             }
             else if (result.startsWith("not registered"))
@@ -306,6 +380,8 @@ public class MainActivity extends FragmentActivity {
         		button.setVisibility(View.VISIBLE);
         		button = (Button) findViewById(R.id.token);		
         		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.logout);		
+        		button.setVisibility(View.INVISIBLE);
             }
             else if (result.startsWith("waiting"))
             {
@@ -315,7 +391,20 @@ public class MainActivity extends FragmentActivity {
         		button.setVisibility(View.INVISIBLE);
         		button = (Button) findViewById(R.id.token);		
         		button.setVisibility(View.VISIBLE);
-            }            	
+        		button = (Button) findViewById(R.id.logout);		
+        		button.setVisibility(View.INVISIBLE);
+            }    
+            else if (result.startsWith("loggedIn"))
+            {
+            	Button button = (Button) findViewById(R.id.scan);		
+                button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.register);		
+        		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.token);		
+        		button.setVisibility(View.INVISIBLE);
+        		button = (Button) findViewById(R.id.logout);		
+        		button.setVisibility(View.VISIBLE);
+            }  
        }
     }
 	

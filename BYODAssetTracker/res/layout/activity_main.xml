@@ -18,7 +18,22 @@
         android:text="@string/register"
         android:onClick="register" 
         android:minHeight="100dp"
-        android:minWidth="200dp"/>
+        android:minWidth="200dp"
+        android:background="#59BADD"
+       	android:textColor="#002060"/>
+    
+    
+    <Button
+        android:id="@+id/token"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="View token" 
+         android:onClick="viewToken"
+         android:minHeight="100dp"
+        android:minWidth="200dp"
+        android:background="#59BADD"
+       	android:textColor="#002060"/>
 
     <Button
         android:id="@+id/scan"
@@ -28,18 +43,22 @@
         android:onClick="sample"
         android:text="Scan" 
         android:minHeight="100dp"
-        android:minWidth="200dp"/>
+        android:minWidth="200dp"
+        android:background="#59BADD"
+       	android:textColor="#002060"/>
 
+    
     <Button
-        android:id="@+id/token"
+        android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="View token" 
-         android:onClick="viewToken"
+        android:text="Logout" 
+         android:onClick="logout"
          android:minHeight="100dp"
-        android:minWidth="200dp"/>
-    
+        android:minWidth="200dp"
+        android:background="#59BADD"
+       	android:textColor="#002060"/>
     
 
 </LinearLayout>

@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -118,7 +119,7 @@ public class RegistrationActivity extends FragmentActivity {
 	        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 	        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 	        if (networkInfo != null && networkInfo.isConnected()) {
-	            new DownloadWebpageTask().execute(stringUrl);
+	            new DownloadWebpageTask(this).execute(stringUrl);
 	        } else {
 	           System.out.println("No network connection available.");
 	        }
@@ -156,6 +157,14 @@ public class RegistrationActivity extends FragmentActivity {
 	}
 	
 	private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+		
+		FragmentActivity activity;
+		
+		public DownloadWebpageTask(FragmentActivity act)
+		{
+			activity = act;
+		}
+		
         @Override
         protected String doInBackground(String... urls) {
               
@@ -169,7 +178,8 @@ public class RegistrationActivity extends FragmentActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            System.out.println("result: " + result);
+        	Intent intent = new Intent(activity, MainActivity.class);
+    		startActivity(intent);		
        }
     }
 	
