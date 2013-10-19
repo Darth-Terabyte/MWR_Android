@@ -15,60 +15,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="14dp"
         android:gravity="center_horizontal"
-        android:text="Access to the network was denied due to the following settings on this device" />
-
-    <Button
-        android:id="@+id/rescan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/result"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="49dp"
-        android:text="Rescan"
-        android:onClick="rescan" 
-        android:width="80dp" 
-        android:gravity="center"
-        android:height="40dp"
-        android:background="#59BADD"
-       	android:textColor="#002060"/>
-
-    <TableLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/rescan"
-        android:layout_below="@+id/rescan"
-        android:layout_marginTop="98dp" >
-
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
-
-    </TableLayout>
+        android:text="Access to the network was denied due to the following settings on this device"
+        android:visibility="visible" />
 
 </RelativeLayout>

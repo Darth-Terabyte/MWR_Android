@@ -6,5 +6,11 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Refresh"/>
+    
+    <item
+        android:id="@+id/viewToken"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="View token"/>
 
 </menu>

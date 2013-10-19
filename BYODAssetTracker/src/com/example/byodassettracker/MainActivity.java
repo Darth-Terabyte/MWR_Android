@@ -122,8 +122,6 @@ public class MainActivity extends FragmentActivity {
 	{
 		super.onResume();
 		
-		
-		
 		try{
 
 		//check status of device
@@ -238,6 +236,9 @@ public class MainActivity extends FragmentActivity {
 	        case R.id.refreshView:
 	            refresh();
 	            return true;
+	        case R.id.viewToken:
+	            viewToken();
+	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	        
@@ -274,6 +275,11 @@ public class MainActivity extends FragmentActivity {
 	
 	
 	public void viewToken(View view)
+	{
+		 viewToken();
+	}
+	
+	public void viewToken()
 	{
 		 TokenGenerator   tokenGen = new TokenGenerator();
 		 DatabaseHandler db = new DatabaseHandler(this);
