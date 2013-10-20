@@ -8,9 +8,6 @@ package com.example.byodassettracker;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-
 
 public class TokenGenerator {
 	
