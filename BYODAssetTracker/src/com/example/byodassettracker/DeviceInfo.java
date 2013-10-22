@@ -160,8 +160,6 @@ public void scan()
 	        str = rInfo.activityInfo.applicationInfo.loadLabel(pm).toString();
 	        installedApps.add(str);
 	    }
-
-	
 	}
 	
 	private void checkDebug()

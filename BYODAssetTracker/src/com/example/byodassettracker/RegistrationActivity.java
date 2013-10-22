@@ -38,11 +38,12 @@ public class RegistrationActivity extends FragmentActivity {
 
 	private String model;
 	private String man;
-	private String username;
-	private String password;
-	private String name;
-	private String surname;
-	private String id;
+	private String username = "";
+	private String password = "";
+	private String password2 = "";
+	private String name = "";
+	private String surname = "";
+	private String id = "";
 	DeviceInfo device;
 
 	@Override
@@ -75,11 +76,26 @@ public class RegistrationActivity extends FragmentActivity {
 		editText = (EditText) findViewById(R.id.password1);
 		password = editText.getText().toString();
 		editText = (EditText) findViewById(R.id.password2);
-		String password2 = editText.getText().toString();
+		password2 = editText.getText().toString();
 		System.out.println(name);
-		if (!password.equals(password2)) {
+		if (name == null || surname == null || id == null || username == null
+				|| password == null || password2 == null) {
+			DialogFragment df = new ErrorDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("message", "One or more fields were left empty");
+			df.setArguments(args);
+		} else if (!password.equals(password2)) {
 			DialogFragment df = new PasswordDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
+		} else if (name.equals("") || surname.equals("") || id.equals("")
+				|| username.equals("") || password.equals("")
+				|| password2.equals("")) {
+			DialogFragment df = new ErrorDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("message", "One or more fields were left empty");
+			df.setArguments(args);
 		} else {
 			// md5 hash password
 			try {

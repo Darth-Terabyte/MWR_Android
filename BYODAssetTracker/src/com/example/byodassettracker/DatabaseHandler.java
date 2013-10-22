@@ -54,7 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
  
     // Adding new contact
-    void addUser(String password) {
+    public void addUser(String password) {
         SQLiteDatabase db = this.getWritableDatabase();
  
         ContentValues values = new ContentValues();
@@ -66,7 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
  
     // Getting single contact
-    String getPassword(int id) {
+    public String getPassword(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
  
         Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_ID,
@@ -80,19 +80,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return password;
     }
      
-   
- 
- 
-    // Getting contacts Count
-    public int getUserCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
- 
-        // return count
-        return cursor.getCount();
-    }
+
     
     void deleteAllData()
     {

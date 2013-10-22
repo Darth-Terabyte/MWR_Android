@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <instrumentation
+       android:name="android.test.InstrumentationTestRunner"
+    android:targetPackage="com.example.byodassettracker.test"
+    android:label="BYOD Test" />
+
 
     <application
         android:allowBackup="true"
@@ -54,7 +59,8 @@
             android:name="com.example.byodassettracker.ScanResults"
             android:label="@string/title_activity_scan_results" >
         </activity>
-        
+        <uses-library android:name="android.test.runner" />
     </application>
+    
 
 </manifest>

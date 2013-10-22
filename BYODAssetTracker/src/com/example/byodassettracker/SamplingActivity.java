@@ -173,7 +173,7 @@ public class SamplingActivity extends FragmentActivity {
 			KeyStoreException, CertificateException, NoSuchAlgorithmException,
 			KeyManagementException {
 		InputStream is = null;
-		int len = 20;
+		int len = 500;
 
 		try {
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");

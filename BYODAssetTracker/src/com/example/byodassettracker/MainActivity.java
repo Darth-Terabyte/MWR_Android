@@ -39,11 +39,13 @@ import android.widget.Button;
 public class MainActivity extends FragmentActivity {
 
 	DeviceInfo device;
+	boolean waiting;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		waiting = false;
 		refresh();
 	}
 
@@ -116,7 +118,16 @@ public class MainActivity extends FragmentActivity {
 			refresh();
 			return true;
 		case R.id.viewToken:
+			if (waiting)
 			viewToken();
+			else
+			{
+				DialogFragment df = new ErrorDialog();
+				df.show(getSupportFragmentManager(), "MyDF");
+				Bundle args = new Bundle();
+				args.putString("message", "Token is only available after registration");
+				df.setArguments(args);
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -172,6 +183,7 @@ public class MainActivity extends FragmentActivity {
 		Bundle args = new Bundle();
 		args.putString("token", token);
 		df.setArguments(args);
+		
 	}
 
 	private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
@@ -195,6 +207,7 @@ public class MainActivity extends FragmentActivity {
 		// onPostExecute displays the results of the AsyncTask.
 		@Override
 		protected void onPostExecute(String result) {
+			
 			if (result.startsWith("registered")) {
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.VISIBLE);
@@ -213,7 +226,7 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.INVISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.INVISIBLE);
-			} else if (result.startsWith("waiting")) {
+			} else if (result.startsWith("waiting")) {				
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.INVISIBLE);
 				button = (Button) findViewById(R.id.register);
@@ -222,6 +235,7 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.VISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.INVISIBLE);
+				waiting = true;
 			} else if (result.startsWith("loggedIn")) {
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.INVISIBLE);
@@ -330,5 +344,9 @@ public class MainActivity extends FragmentActivity {
 		}
 
 	}
+	
+	
+	
+	
 
 }

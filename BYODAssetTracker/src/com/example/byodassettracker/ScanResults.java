@@ -1,39 +1,29 @@
 package com.example.byodassettracker;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.Html;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-public class ScanResults extends Activity {
+public class ScanResults extends FragmentActivity {
+	
+	private static final String BULLET_SYMBOL = "&#8226";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_scan_results);
-		Intent intent = getIntent();
+		TextView tv = (TextView) findViewById(R.id.list);	
+		Intent intent = this.getIntent();
 	    String result = intent.getExtras().getString("result");
 	    String[] categories = result.split(";");
-	    TableLayout ll=new TableLayout(this);
-        ScrollView sv = new ScrollView(this);
 
         for(int i=1;i<categories.length;i++) {
-            TableRow tbrow=new TableRow(this);
-            String[] parts = categories[i].split(":");
-            for(int j=0;j<parts.length;j++) {
-                TextView tv1=new TextView(this);
-                tv1.setText(parts[j]);
-                tbrow.addView(tv1);
-            }
-            ll.addView(tbrow);
+        	tv.append(System.getProperty("line.separator")+ Html.fromHtml(BULLET_SYMBOL + categories[i]));
         }
-        sv.addView(ll);
-        setContentView(sv);
 	    
 	    
 	}
