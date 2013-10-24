@@ -219,7 +219,6 @@ public class MainActivity extends FragmentActivity {
 			df.show(getSupportFragmentManager(), "MyDF");
 			Bundle args = new Bundle();
 			args.putString("message", "Unable to connect to server.");
-			e.printStackTrace();
 			df.setArguments(args);
 			if (result.startsWith("registered")) {
 				Button button = (Button) findViewById(R.id.scan);
