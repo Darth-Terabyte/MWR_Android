@@ -96,6 +96,12 @@ public class RegistrationActivity extends FragmentActivity {
 			Bundle args = new Bundle();
 			args.putString("message", "One or more fields were left empty");
 			df.setArguments(args);
+		} else if (id.length() != 13) {
+			DialogFragment df = new ErrorDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("message", "Please enter a valid ID number");
+			df.setArguments(args);
 		} else {
 			// md5 hash password
 			try {
