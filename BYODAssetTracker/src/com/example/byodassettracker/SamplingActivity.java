@@ -110,7 +110,7 @@ public class SamplingActivity extends FragmentActivity {
 			DialogFragment df = new ErrorDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
 			Bundle args = new Bundle();
-			args.putString("message", "No network connection available");
+			args.putString("message", "No network connection available. Connect to WiFi network.");
 			df.setArguments(args);
 		}
 

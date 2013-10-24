@@ -78,8 +78,14 @@ public class RegistrationActivity extends FragmentActivity {
 		editText = (EditText) findViewById(R.id.password2);
 		password2 = editText.getText().toString();
 		System.out.println(name);
-		if (name == null || surname == null || id == null || username == null
-				|| password == null || password2 == null) {
+		if (id.length() != 13) {
+			DialogFragment df = new ErrorDialog();
+			df.show(getSupportFragmentManager(), "MyDF");
+			Bundle args = new Bundle();
+			args.putString("message", "Please enter a valid ID number");
+			df.setArguments(args);
+		} else if (name == null || surname == null || id == null
+				|| username == null || password == null || password2 == null) {
 			DialogFragment df = new ErrorDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
 			Bundle args = new Bundle();
@@ -96,12 +102,7 @@ public class RegistrationActivity extends FragmentActivity {
 			Bundle args = new Bundle();
 			args.putString("message", "One or more fields were left empty");
 			df.setArguments(args);
-		} else if (id.length() != 13) {
-			DialogFragment df = new ErrorDialog();
-			df.show(getSupportFragmentManager(), "MyDF");
-			Bundle args = new Bundle();
-			args.putString("message", "Please enter a valid ID number");
-			df.setArguments(args);
+
 		} else {
 			// md5 hash password
 			try {
@@ -123,7 +124,7 @@ public class RegistrationActivity extends FragmentActivity {
 				if (networkInfo != null && networkInfo.isConnected()) {
 					new DownloadWebpageTask(this).execute(stringUrl);
 				} else {
-					System.out.println("No network connection available.");
+					System.out.println("No network connection available. Connect to WiFi network.");
 				}
 
 				// save password in db
@@ -141,6 +142,7 @@ public class RegistrationActivity extends FragmentActivity {
 				DialogFragment df = new TokenDialog();
 				df.show(getSupportFragmentManager(), "MyDF");
 				Bundle args = new Bundle();
+				token += ". Please contact the system adminstrator to finalise registration.";
 				args.putString("token", token);
 				df.setArguments(args);
 			} catch (Exception e) {

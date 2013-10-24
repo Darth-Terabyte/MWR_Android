@@ -35,17 +35,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 public class MainActivity extends FragmentActivity {
 
 	DeviceInfo device;
 	boolean waiting;
+	boolean registered;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		waiting = false;
+		registered = false;
 		refresh();
 	}
 
@@ -83,7 +86,7 @@ public class MainActivity extends FragmentActivity {
 				DialogFragment df = new ErrorDialog();
 				df.show(getSupportFragmentManager(), "MyDF");
 				Bundle args = new Bundle();
-				args.putString("message", "No network connection available");
+				args.putString("message", "No network connection available. Connect to WiFi network.");
 				df.setArguments(args);
 			}
 			Button button = (Button) findViewById(R.id.scan);
@@ -94,6 +97,8 @@ public class MainActivity extends FragmentActivity {
 			button.setVisibility(View.INVISIBLE);
 			button = (Button) findViewById(R.id.logout);
 			button.setVisibility(View.INVISIBLE);
+			ProgressBar bar = (ProgressBar)findViewById(R.id.progress);
+			bar.setVisibility(View.VISIBLE);
 		} catch (Exception e) {
 			DialogFragment df = new ErrorDialog();
 			df.show(getSupportFragmentManager(), "MyDF");
@@ -181,6 +186,8 @@ public class MainActivity extends FragmentActivity {
 		DialogFragment df = new TokenDialog();
 		df.show(getSupportFragmentManager(), "MyDF");
 		Bundle args = new Bundle();
+		if (!registered)
+			token += ". Please contact the system adminstrator to finalise registration.";
 		args.putString("token", token);
 		df.setArguments(args);
 		
@@ -217,6 +224,10 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.INVISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.INVISIBLE);
+				ProgressBar bar = (ProgressBar)findViewById(R.id.progress);
+				bar.setVisibility(View.INVISIBLE);
+				waiting = true;
+				registered = true;
 			} else if (result.startsWith("not registered")) {
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.INVISIBLE);
@@ -226,6 +237,10 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.INVISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.INVISIBLE);
+				ProgressBar bar = (ProgressBar)findViewById(R.id.progress);
+				bar.setVisibility(View.INVISIBLE);
+				waiting = false;
+				registered = false;
 			} else if (result.startsWith("waiting")) {				
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.INVISIBLE);
@@ -235,7 +250,10 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.VISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.INVISIBLE);
+				ProgressBar bar = (ProgressBar)findViewById(R.id.progress);
+				bar.setVisibility(View.INVISIBLE);
 				waiting = true;
+				registered = false;
 			} else if (result.startsWith("loggedIn")) {
 				Button button = (Button) findViewById(R.id.scan);
 				button.setVisibility(View.INVISIBLE);
@@ -245,12 +263,10 @@ public class MainActivity extends FragmentActivity {
 				button.setVisibility(View.INVISIBLE);
 				button = (Button) findViewById(R.id.logout);
 				button.setVisibility(View.VISIBLE);
-			} else {
-				DialogFragment df = new ErrorDialog();
-				df.show(getSupportFragmentManager(), "MyDF");
-				Bundle args = new Bundle();
-				args.putString("message", "Unknown response");
-				df.setArguments(args);
+				ProgressBar bar = (ProgressBar)findViewById(R.id.progress);
+				bar.setVisibility(View.INVISIBLE);
+				waiting = true;
+				registered = true;
 			}
 		}
 	}

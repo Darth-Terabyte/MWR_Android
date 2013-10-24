@@ -26,7 +26,8 @@
         android:theme="@style/CustomTheme" android:debuggable="false">
         <activity
             android:name="com.example.byodassettracker.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +38,8 @@
         <activity
             android:name="com.example.byodassettracker.ScanActivity"
             android:label="@string/title_activity_scan"
-            android:parentActivityName="com.example.byodassettracker.MainActivity" >
+            android:parentActivityName="com.example.byodassettracker.MainActivity" 
+             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.byodassettracker.MainActivity" />
@@ -45,19 +47,23 @@
         <activity
             android:name="com.example.byodassettracker.LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            android:windowSoftInputMode="adjustResize|stateVisible" 
+             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="com.example.byodassettracker.SamplingActivity"
-            android:label="@string/title_activity_sampling" >
+            android:label="@string/title_activity_sampling"
+             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.byodassettracker.RegistrationActivity"
-            android:label="@string/title_activity_registration" >
+            android:label="@string/title_activity_registration"
+             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.byodassettracker.ScanResults"
-            android:label="@string/title_activity_scan_results" >
+            android:label="@string/title_activity_scan_results" 
+             android:screenOrientation="portrait">
         </activity>
         <uses-library android:name="android.test.runner" />
     </application>

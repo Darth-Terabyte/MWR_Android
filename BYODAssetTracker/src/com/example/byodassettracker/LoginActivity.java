@@ -91,7 +91,7 @@ public class LoginActivity extends FragmentActivity {
 				DialogFragment df = new ErrorDialog();
 				df.show(getSupportFragmentManager(), "MyDF");
 				Bundle args = new Bundle();
-				args.putString("message", "No network connection available");
+				args.putString("message", "No network connection available. Connect to WiFi network.");
 				df.setArguments(args);
 			}
 
@@ -140,13 +140,7 @@ public class LoginActivity extends FragmentActivity {
 			} else if (result.startsWith("denied")) {
 				DialogFragment df = new AccessDeniedDialog();
 				df.show(getSupportFragmentManager(), "MyDF");
-			} else {
-				DialogFragment df = new ErrorDialog();
-				df.show(getSupportFragmentManager(), "MyDF");
-				Bundle args = new Bundle();
-				args.putString("message", "Unknown response");
-				df.setArguments(args);
-			}
+			} 
 		}
 	}
 

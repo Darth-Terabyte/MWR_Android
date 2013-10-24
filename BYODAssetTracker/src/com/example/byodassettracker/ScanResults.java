@@ -37,10 +37,8 @@ public class ScanResults extends FragmentActivity {
 	
 	@Override
     public void onBackPressed() {
-		Intent main = new Intent(Intent.ACTION_MAIN);
-		main.addCategory(Intent.CATEGORY_HOME);
-		main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(main);	
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
     }
 	
 	public void rescan(View view)
