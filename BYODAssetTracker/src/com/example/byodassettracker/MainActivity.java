@@ -204,7 +204,8 @@ public class MainActivity extends FragmentActivity {
 				DialogFragment df = new ErrorDialog();
 				df.show(getSupportFragmentManager(), "MyDF");
 				Bundle args = new Bundle();
-				args.putString("message", "Unable to connect to server");
+				args.putString("message", "Unable to connect to server.");
+				e.printStackTrace();
 				df.setArguments(args);
 				return "Unable to retrieve web page. URL may be invalid.";
 			}
